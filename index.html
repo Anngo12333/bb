@@ -295,11 +295,11 @@
                 <button class="btn" id="scanBtn" onclick="scanLocalData()" style="background: linear-gradient(135deg, #9B59B6, #8E44AD);">
                     📡 啟動 AI 大數據深度掃描
                 </button>
-                <div id="scan-load" class="loader">⏳ 分析歷史數據中...</div>
+                <div id="scan-load" class="loader">⏳ 分析大數據中...</div>
             </div>
         </div>
 
-        <!-- 分頁 4: 歷史庫 (搭載冷歸檔系統) -->
+        <!-- 分頁 4: 歷史庫 (搭載冷歸檔系統與全量掃描) -->
         <div id="t-mem" class="tab">
             <div class="card">
                 <div class="title-txt">💾 雲端時光庫 (本地加密)</div>
@@ -316,17 +316,17 @@
                 <div style="background: #FAF9FC; border: 2px dashed #9B59B6; padding: 16px; border-radius: 15px; margin-bottom: 20px;">
                     <div style="color: #8E44AD; font-weight: 800; margin-bottom: 10px; font-size: 15px;">📦 雲端冷歸檔 (無限容量管理)</div>
                     <div style="font-size: 13px; color: #7F8C8D; margin-bottom: 14px; line-height: 1.5;">
-                        支援 Google Drive / iCloud 檔案映射。將舊資料打包釋放手機空間，或免寫入快取直接載入舊檔進行全量回顧。
+                        支援 Google Drive 多檔案同時映射，進行<b>純記憶體全量融合</b>與 <b>AI 全年度天賦掃描</b>，不佔用手機快取。
                     </div>
                     <div style="display:flex; gap:10px;">
                         <button class="btn" onclick="archiveAndResetHotCache()" style="flex:1; background: #8E44AD; font-size:13px; padding:10px;">📦 封存並清空快取</button>
                         <label class="btn" style="flex:1; background: #34495E; font-size:13px; padding:10px; margin:0; text-align:center;">
-                            📂 載入封存包瀏覽 <input type="file" accept=".json" style="display:none;" onchange="loadColdArchiveDirectly(this)">
+                            📂 載入多個封存包 <input type="file" accept=".json" multiple style="display:none;" onchange="loadColdArchiveDirectly(this)">
                         </label>
                     </div>
                 </div>
 
-                <div id="his-load" class="loader">⏳ 讀取中...</div>
+                <div id="his-load" class="loader">⏳ 讀取與融合中...</div>
                 <div id="his"></div>
             </div>
         </div>
@@ -379,21 +379,16 @@
     // 🗄️ 大數據區塊 2：蒙特梭利營養食譜旗艦庫 (Massive Recipe Hub)
     // =================================================================
     const recipeDatabase = [
-        // --- 早餐類 (Breakfast) ---
         { id: 'r_bf_01', type: 'breakfast', name: "助眠安神：櫻花蝦蒸蛋", nutrition: "褪黑激素前驅物(雞蛋) + 極高天然鈣質(安定神經)", shopping_list: "- 雞蛋 1顆\n- 無鹽櫻花蝦 少許\n- 高湯 50ml", steps: "雞蛋打散加入高湯與櫻花蝦，放入電鍋蒸約10分鐘至凝固。", montessori: "『打蛋』是 3 歲以上孩子最愛的挑戰！教導他們在碗邊輕敲，並給予一把小打蛋器練習均勻攪拌。" },
         { id: 'r_bf_02', type: 'breakfast', name: "大腦火箭：酪梨鮮蝦吐司", nutrition: "DHA(鮮蝦) + 優質Omega-9脂肪(酪梨)，促進腦神經突觸生長", shopping_list: "- 全麥吐司 1片\n- 熟透酪梨 1/4顆\n- 鮮蝦 3隻", steps: "鮮蝦燙熟切碎。酪梨壓成泥塗抹在烤好的吐司上，撒上蝦碎。", montessori: "給孩子一把安全的奶油抹刀，練習將酪梨泥『均勻塗抹』在吐司上，這是絕佳的精細動作與力道控制訓練。" },
         { id: 'r_bf_03', type: 'breakfast', name: "穩定血糖：燕麥蘋果無粉煎餅", nutrition: "低GI燕麥與天然果糖，防止早上血糖飆升引起情緒暴躁", shopping_list: "- 原味燕麥 30g\n- 雞蛋 1顆\n- 蘋果 1/4顆 (刨絲)", steps: "燕麥泡軟與雞蛋、蘋果絲混勻。平底鍋少油慢煎至兩面金黃。", montessori: "讓孩子用刨絲器(需家長握著手)將蘋果刨絲，感受不同質地的變化，並負責將麵糊『舀』入鍋中。" },
         { id: 'r_bf_04', type: 'breakfast', name: "免疫力滿分：南瓜鮮奶饅頭", nutrition: "南瓜Beta胡蘿蔔素，提升上呼吸道抵抗力", shopping_list: "- 熟南瓜泥 50g\n- 麵粉 150g\n- 酵母 2g\n- 鮮奶 40ml", steps: "材料揉成光滑麵糰，發酵後切塊，蒸15分鐘。", montessori: "這根本是可食用的黏土！邀請孩子一起『揉麵糰』，這種深層本體覺的按壓能大幅降低孩子的焦慮感。" },
-
-        // --- 主食類 (Mains) ---
         { id: 'r_main_01', type: 'main', name: "手抓自主訓練：鮮蔬一口飯糰", nutrition: "豐富碳水化合物與多樣微量元素，適合訓練咀嚼", shopping_list: "- 軟飯 1碗 (約100g)\n- 鮭魚鬆 15g\n- 熟紅蘿蔔丁 少許", steps: "將食材拌勻，裝入乾淨的食品塑膠袋中，捏成直徑約 3 公分的小飯糰。", montessori: "邀請孩子親自用手隔著塑膠袋『捏飯糰』。自己捏的飯糰能極大增加進食成就感，解決挑食問題！" },
         { id: 'r_main_02', type: 'main', name: "補鐵補氧：菠菜牛肉軟飯", nutrition: "高生物價鐵質與蛋白質，大腦海馬迴與肌肉發育關鍵", shopping_list: "- 牛絞肉 40g\n- 新鮮菠菜 30g\n- 軟飯 50g", steps: "菠菜燙過切極碎去草酸。牛肉炒香，加入菠菜與軟飯悶煮3分鐘。", montessori: "準備一個小水盆，讓孩子練習用手一片片『清洗菠菜葉』，訓練精細動作與為家庭付出的責任感。" },
         { id: 'r_main_03', type: 'main', name: "神經修復：鮮菇藜麥雞肉燉飯", nutrition: "超級食物藜麥(完全蛋白) + 多醣體，穩定神經與免疫", shopping_list: "- 藜麥與白米 1:1 共50g\n- 雞胸肉丁 40g\n- 鴻喜菇 少許", steps: "雞肉與菇類炒香，加入洗淨的藜麥米與高湯，燉煮15分鐘至軟爛。", montessori: "讓孩子負責將鴻喜菇一根一根『撕開』。這項工作完全不需要刀具，安全且極度吸引 3-4 歲幼兒的注意力。" },
         { id: 'r_main_04', type: 'main', name: "兒童參與：手撕高麗菜炒肉片", nutrition: "高麗菜提供優質膳食纖維，維持腸道健康(腸腦軸線)", shopping_list: "- 高麗菜 1/4顆\n- 豬肉片 50g", steps: "高麗菜洗淨撕碎，與肉片同炒，加少許天然鹽調味。", montessori: "完全不需要刀具！邀請孩子坐在餐桌旁，將高麗菜葉一片片「撕」成小塊。參與感能提升60%接受度。" },
         { id: 'r_main_05', type: 'main', name: "抗發炎魔法：番茄肉醬糙米麵", nutrition: "茄紅素與維生素B群，對抗身體發炎並修復神經", shopping_list: "- 牛豬混合絞肉 50g\n- 大番茄 1顆\n- 糙米義大利麵 適量", steps: "番茄底部劃十字燙過去皮切丁。熬煮成肉醬後拌入煮熟的糙米麵。", montessori: "讓孩子負責把冷卻後的番茄『剝皮』，這種撕拉的觸覺回饋對感覺統合非常有益。" },
         { id: 'r_main_06', type: 'main', name: "植物蛋白霸主：雙色地瓜豆腐排", nutrition: "植物性優質蛋白與高纖，解決幼兒便秘困擾", shopping_list: "- 板豆腐 50g\n- 豬絞肉 20g\n- 雙色地瓜丁(先蒸軟) 30g", steps: "豆腐壓去水分，與絞肉、地瓜丁混勻，少油煎至定型。", montessori: "孩子最喜歡『壓扁』東西！給他一把叉子，讓他把豆腐壓成泥，這能幫助釋放多餘的精力。" },
-
-        // --- 點心/護腦類 (Snacks) ---
         { id: 'r_snack_01', type: 'snack', name: "大腦健康甜點：藍莓燕麥優格", nutrition: "花青素(護眼) + 腸道益生菌(平穩情緒)", shopping_list: "- 無糖希臘優格 1小杯\n- 新鮮藍莓 10顆\n- 原味燕麥片 1匙", steps: "將所有材料混合即可。若怕燕麥太硬，可提前一晚泡入優格中軟化。", montessori: "準備一個小碗與專屬小湯匙，讓孩子自己練習將藍莓『舀』進優格碗裡，訓練手眼協調。" },
         { id: 'r_snack_02', type: 'snack', name: "專注力補給：核桃黑芝麻糊", nutrition: "高鈣(芝麻) + 卵磷脂(核桃)，提升神經傳導效率", shopping_list: "- 黑芝麻粉 1大匙\n- 碎核桃 少許(確認無過敏)\n- 鮮奶 100ml", steps: "鮮奶微波溫熱，拌入黑芝麻粉與壓碎的核桃末。", montessori: "讓孩子將核桃放入厚夾鏈袋中，用木槌或小杯底『敲碎』，這不僅是食物準備，也是極佳的情緒發洩管道。" },
         { id: 'r_snack_03', type: 'snack', name: "隱形蔬菜魔法：甜椒蘋果汁", nutrition: "維生素C與植化素爆炸，打破對甜椒的恐懼", shopping_list: "- 紅甜椒 1/4顆\n- 蘋果 半顆\n- 溫開水 50ml", steps: "甜椒稍微燙過減少生味，與蘋果一起放入果汁機打勻。", montessori: "讓孩子負責將切好的蘋果塊『投入』果汁機，並讓他們負責按下果汁機的『開關』(享受因果關係的掌控感)。" },
@@ -404,83 +399,17 @@
     // 🗄️ 大數據區塊 3：蒙特梭利 & 皮亞傑 育兒行為大數據
     // =================================================================
     const mockAIDatabase = [
-        {
-            keywords: ['自己吃飯', '餐具', '動手', '獨立'],
-            diary_title: "「我自己來！」獨立性的萌芽", stats: { health: 90, mood: 95, diet: 80 },
-            psy_analysis: "【愛利克森心理學】處於「主動對內疚」階段，若父母過度干涉(怕髒而代為餵食)，會讓孩子產生能力不足的內疚感。",
-            tips: "【蒙特梭利】為孩子準備「適合他尺寸」的餐具與抹布。吃得一塌糊塗時，教他『如何清理』，而不是責備或剝奪他自己吃的機會。",
-            recipe_id: 'r_main_01'
-        },
-        {
-            keywords: ['挑食', '拒吃', '不吃', '吐'],
-            diary_title: "面對幼兒「食物恐新症」", stats: { health: 70, mood: 60, diet: 90 },
-            psy_analysis: "【大腦發展】他們對苦味和不熟悉的質地極度敏感。強迫進食會啟動杏仁核的「戰鬥或逃跑」反應，導致未來更排斥。",
-            tips: "【正向教養】實行「責任分散制」：父母負責決定『準備什麼』，孩子負責決定『吃多少』。只要他願意將菜放在盤子裡就是進步。",
-            recipe_id: 'r_snack_03'
-        },
-        {
-            keywords: ['家事', '幫忙', '擦桌子', '收玩具'],
-            diary_title: "日常生活練習的黃金期", stats: { health: 90, mood: 100, diet: 85 },
-            psy_analysis: "【阿德勒心理學】貢獻感是孩子自信的來源。當他覺得「我是有用的」，行為問題就會大幅減少。",
-            tips: "【蒙特梭利 Practical Life】此時期的家事不是為了「做完美」，而是為了「過程」。給他一把小掃把，這是最好的專注力訓練。",
-            recipe_id: 'r_main_04'
-        },
-        {
-            keywords: ['零食', '糖', '甜', '想吃'],
-            diary_title: "血糖波動與零食攻防戰", stats: { health: 60, mood: 50, diet: 40 },
-            psy_analysis: "【行為制約】如果把零食當作「乖乖吃飯的獎勵」，會讓孩子潛意識認為「正餐是痛苦的，零食才是好的」。",
-            tips: "【營養學教養】不要完全禁止(會造成報復性吃糖)，而是「規範時間與份量」。例如：下午3點是固定的點心時間，提供健康替代品。",
-            recipe_id: 'r_snack_04'
-        },
-        {
-            keywords: ['公園', '跑', '跳', '放電', '溜滑梯'],
-            diary_title: "前庭覺與本體覺的大補丸", stats: { health: 100, mood: 95, diet: 90 },
-            psy_analysis: "【感統發展】3-6歲是感覺統合發展巔峰。戶外活動能提升血清素與多巴胺分泌，有效提升情緒穩定度與睡眠品質。",
-            tips: "【風險評估能力】在安全的遊具上，忍住不要說「小心會掉下來」。改成：「你有抓緊嗎？腳踩穩喔。」讓孩子評估自己的能力。",
-            recipe_id: 'r_main_05'
-        },
-        {
-            keywords: ['畫畫', '剪刀', '積木', '拼圖', '手', '勞作'],
-            diary_title: "指尖上的大腦體操", stats: { health: 85, mood: 90, diet: 80 },
-            psy_analysis: "【皮亞傑認知發展】3歲後的畫作從「塗鴉」逐漸進入「象徵期」。這是抽象思維發展的重大里程碑。",
-            tips: "【引導技巧】展示作品時，不要只說「好漂亮」。試著問：「你可以告訴我這個紅色的是什麼故事嗎？」激發語言表達。",
-            recipe_id: 'r_bf_02'
-        },
-        {
-            keywords: ['為什麼', '問', '一直問', '好奇'],
-            diary_title: "無止盡的「十萬個為什麼」", stats: { health: 85, mood: 95, diet: 80 },
-            psy_analysis: "【認知心理學】這顯示他的邏輯思維與語言結構正在飛速成長。每一次回答，都在建構他的世界觀。",
-            tips: "【反問法】當你被問到煩時，試著把球丟回去：「真是個好問題！你覺得為什麼天是藍的呢？」鼓勵他先自己思考。",
-            recipe_id: 'r_snack_02'
-        },
-        {
-            keywords: ['繪本', '故事', '書', '共讀', '讀'],
-            diary_title: "海綿般的語言與同理心吸收期", stats: { health: 80, mood: 100, diet: 80 },
-            psy_analysis: "【心智理論】聽故事是3-6歲孩子發展「同理心」的最佳途徑，他們開始能理解主角為什麼會難過。",
-            tips: "【哈佛對話式閱讀】多問寶寶「這是什麼？」、「他為什麼在哭？」，讓他成為說故事的參與者，而不只是聆聽者。",
-            recipe_id: 'r_bf_04'
-        },
-        {
-            keywords: ['崩潰', '哭鬧', '生氣', '情緒', '尖叫'],
-            diary_title: "理智斷線的「杏仁核劫持」", stats: { health: 70, mood: 30, diet: 70 },
-            psy_analysis: "【大腦科學】大腦「理智中心」尚未成熟，被「情緒中心」接管。此時講道理無效，因為聽覺處理區域已經關閉。",
-            tips: "【先連結，再規範】1. 接納陪伴 2. 標明情緒(「我知道積木倒了你很生氣」) 3. 轉移或解決(等他平靜後再來討論)。",
-            recipe_id: 'r_bf_01'
-        },
-        {
-            keywords: ['搶', '玩具', '打人', '爭吵'],
-            diary_title: "物權觀念與社交衝突", stats: { health: 85, mood: 60, diet: 85 },
-            psy_analysis: "【皮亞傑 自我中心主義】3-4歲孩子處於「我看到的就是我的」。強迫分享會破壞安全感，分享須建立在「物權安全感」之上。",
-            tips: "【衝突介入】父母應作為和平翻譯機。說：「你想玩這個對嗎？但小明正在玩。我們可以問他『等一下可以借我嗎？』」",
-            recipe_id: 'r_main_03'
-        },
-        {
-            keywords: ['不睡覺', '睡', '晚上', '夜驚'],
-            diary_title: "睡眠抗拒與神經元修剪", stats: { health: 70, mood: 50, diet: 75 },
-            psy_analysis: "【睡眠心理學】睡眠抗拒通常來自「分離焦慮」或「想要掌控自主權」(覺得睡覺很無聊)。",
-            tips: "【建立儀式感】提前一小時關閉螢幕(藍光抑制褪黑激素)。給孩子有限的選擇權：「今晚聽小熊還是兔子的故事？」",
-            recipe_id: 'r_bf_01'
-        }
+        { keywords: ['自己吃飯', '餐具', '動手', '獨立'], diary_title: "「我自己來！」獨立性的萌芽", stats: { health: 90, mood: 95, diet: 80 }, psy_analysis: "【愛利克森心理學】處於「主動對內疚」階段，若父母過度干涉(怕髒而代為餵食)，會讓孩子產生能力不足的內疚感。", tips: "【蒙特梭利】為孩子準備「適合他尺寸」的餐具與抹布。吃得一塌糊塗時，教他『如何清理』，而不是責備或剝奪他自己吃的機會。", recipe_id: 'r_main_01' },
+        { keywords: ['挑食', '拒吃', '不吃', '吐'], diary_title: "面對幼兒「食物恐新症」", stats: { health: 70, mood: 60, diet: 90 }, psy_analysis: "【大腦發展】他們對苦味和不熟悉的質地極度敏感。強迫進食會啟動杏仁核的「戰鬥或逃跑」反應，導致未來更排斥。", tips: "【正向教養】實行「責任分散制」：父母負責決定『準備什麼』，孩子負責決定『吃多少』。只要他願意將菜放在盤子裡就是進步。", recipe_id: 'r_snack_03' },
+        { keywords: ['家事', '幫忙', '擦桌子', '收玩具'], diary_title: "日常生活練習的黃金期", stats: { health: 90, mood: 100, diet: 85 }, psy_analysis: "【阿德勒心理學】貢獻感是孩子自信的來源。當他覺得「我是有用的」，行為問題就會大幅減少。", tips: "【蒙特梭利 Practical Life】此時期的家事不是為了「做完美」，而是為了「過程」。給他一把小掃把，這是最好的專注力訓練。", recipe_id: 'r_main_04' },
+        { keywords: ['零食', '糖', '甜', '想吃'], diary_title: "血糖波動與零食攻防戰", stats: { health: 60, mood: 50, diet: 40 }, psy_analysis: "【行為制約】如果把零食當作「乖乖吃飯的獎勵」，會讓孩子潛意識認為「正餐是痛苦的，零食才是好的」。", tips: "【營養學教養】不要完全禁止(會造成報復性吃糖)，而是「規範時間與份量」。例如：下午3點是固定的點心時間，提供健康替代品。", recipe_id: 'r_snack_04' },
+        { keywords: ['公園', '跑', '跳', '放電', '溜滑梯'], diary_title: "前庭覺與本體覺的大補丸", stats: { health: 100, mood: 95, diet: 90 }, psy_analysis: "【感統發展】3-6歲是感覺統合發展巔峰。戶外活動能提升血清素與多巴胺分泌，有效提升情緒穩定度與睡眠品質。", tips: "【風險評估能力】在安全的遊具上，忍住不要說「小心會掉下來」。改成：「你有抓緊嗎？腳踩穩喔。」讓孩子評估自己的能力。", recipe_id: 'r_main_05' },
+        { keywords: ['畫畫', '剪刀', '積木', '拼圖', '手', '勞作'], diary_title: "指尖上的大腦體操", stats: { health: 85, mood: 90, diet: 80 }, psy_analysis: "【皮亞傑認知發展】3歲後的畫作從「塗鴉」逐漸進入「象徵期」。這是抽象思維發展的重大里程碑。", tips: "【引導技巧】展示作品時，不要只說「好漂亮」。試著問：「你可以告訴我這個紅色的是什麼故事嗎？」激發語言表達。", recipe_id: 'r_bf_02' },
+        { keywords: ['為什麼', '問', '一直問', '好奇'], diary_title: "無止盡的「十萬個為什麼」", stats: { health: 85, mood: 95, diet: 80 }, psy_analysis: "【認知心理學】這顯示他的邏輯思維與語言結構正在飛速成長。每一次回答，都在建構他的世界觀。", tips: "【反問法】當你被問到煩時，試著把球丟回去：「真是個好問題！你覺得為什麼天是藍的呢？」鼓勵他先自己思考。", recipe_id: 'r_snack_02' },
+        { keywords: ['繪本', '故事', '書', '共讀', '讀'], diary_title: "海綿般的語言與同理心吸收期", stats: { health: 80, mood: 100, diet: 80 }, psy_analysis: "【心智理論】聽故事是3-6歲孩子發展「同理心」的最佳途徑，他們開始能理解主角為什麼會難過。", tips: "【哈佛對話式閱讀】多問寶寶「這是什麼？」、「他為什麼在哭？」，讓他成為說故事的參與者，而不只是聆聽者。", recipe_id: 'r_bf_04' },
+        { keywords: ['崩潰', '哭鬧', '生氣', '情緒', '尖叫'], diary_title: "理智斷線的「杏仁核劫持」", stats: { health: 70, mood: 30, diet: 70 }, psy_analysis: "【大腦科學】大腦「理智中心」尚未成熟，被「情緒中心」接管。此時講道理無效，因為聽覺處理區域已經關閉。", tips: "【先連結，再規範】1. 接納陪伴 2. 標明情緒(「我知道積木倒了你很生氣」) 3. 轉移或解決(等他平靜後再來討論)。", recipe_id: 'r_bf_01' },
+        { keywords: ['搶', '玩具', '打人', '爭吵'], diary_title: "物權觀念與社交衝突", stats: { health: 85, mood: 60, diet: 85 }, psy_analysis: "【皮亞傑 自我中心主義】3-4歲孩子處於「我看到的就是我的」。強迫分享會破壞安全感，分享須建立在「物權安全感」之上。", tips: "【衝突介入】父母應作為和平翻譯機。說：「你想玩這個對嗎？但小明正在玩。我們可以問他『等一下可以借我嗎？』」", recipe_id: 'r_main_03' },
+        { keywords: ['不睡覺', '睡', '晚上', '夜驚'], diary_title: "睡眠抗拒與神經元修剪", stats: { health: 70, mood: 50, diet: 75 }, psy_analysis: "【睡眠心理學】睡眠抗拒通常來自「分離焦慮」或「想要掌控自主權」(覺得睡覺很無聊)。", tips: "【建立儀式感】提前一小時關閉螢幕(藍光抑制褪黑激素)。給孩子有限的選擇權：「今晚聽小熊還是兔子的故事？」", recipe_id: 'r_bf_01' }
     ];
 
     const fallbackData = {
@@ -500,8 +429,11 @@
     ];
 
     const PIN = '2023'; 
-    const DB_KEY = 'babyHistory_FlagshipV3'; // 更新資料庫 Key 避免衝突
+    const DB_KEY = 'babyHistory_FlagshipV3';
     let ep = "", compressedBase64 = "", activeTags = [];
+    
+    // 🔥 核心變數：用於儲存載入的冷歸檔資料，實現全量 AI 掃描
+    let memoryArchiveData = null; 
 
     window.onload = () => { 
         initBadges(); 
@@ -560,7 +492,6 @@
         }
     }
 
-    // --- 快速標籤邏輯 ---
     function toggleTag(btn, tagStr, category) {
         btn.classList.toggle('active');
         if (btn.classList.contains('active')) activeTags.push({str: tagStr, cat: category});
@@ -583,7 +514,7 @@
         else txtArea.value = currentText;
     }
 
-    // --- 🍎 食材大數據快搜模組 (自建+內建字典) ---
+    // --- 🍎 雙語食材字典快搜 ---
     function suggestFood(val) {
         let box = document.getElementById('foodSuggestions');
         if (!val.trim()) { box.style.display = 'none'; return; }
@@ -626,7 +557,7 @@
         showT(`已加入食材：${val}`);
     }
 
-    // --- 📍 地點快搜模組 (Self-Building) ---
+    // --- 📍 地點大數據快搜 ---
     function suggestPlaces(val) {
         let box = document.getElementById('placeSuggestions');
         if (!val.trim()) { box.style.display = 'none'; return; }
@@ -650,17 +581,11 @@
     }
     
     document.addEventListener('click', function(e) {
-        if(!e.target.closest('#placeInput')) {
-            let pBox = document.getElementById('placeSuggestions');
-            if(pBox) pBox.style.display = 'none';
-        }
-        if(!e.target.closest('#foodInput')) {
-            let fBox = document.getElementById('foodSuggestions');
-            if(fBox) fBox.style.display = 'none';
-        }
+        if(!e.target.closest('#placeInput')) { let pBox = document.getElementById('placeSuggestions'); if(pBox) pBox.style.display = 'none'; }
+        if(!e.target.closest('#foodInput')) { let fBox = document.getElementById('foodSuggestions'); if(fBox) fBox.style.display = 'none'; }
     });
 
-    // --- 🧠 核心：智能語意評分演算法 (TF-IDF + 食譜雙引擎聯動) ---
+    // --- 🧠 核心：智能語意評分演算法 ---
     function getMockData(tags, text) {
         const combinedText = (tags.map(t=>t.str).join(' ') + ' ' + text).toLowerCase();
         let bestMatch = fallbackData;
@@ -672,10 +597,7 @@
                 if (tags.some(t => t.str.includes(kw))) score += 5; 
                 else if (combinedText.includes(kw)) score += 1;
             });
-            if (score > highestScore) {
-                highestScore = score;
-                bestMatch = data;
-            }
+            if (score > highestScore) { highestScore = score; bestMatch = data; }
         });
         
         let linkedRecipe = recipeDatabase.find(r => r.id === bestMatch.recipe_id);
@@ -730,17 +652,9 @@
     function saveToLocalDB(text, aiData, imgData) {
         let placeVal = document.getElementById('placeInput').value.trim();
         let foodVal = document.getElementById('foodInput').value.trim();
-        
         try {
             let history = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
-            history.unshift({
-                time: new Date().getTime(),
-                text: text,
-                title: aiData.diary_title,
-                img: imgData,
-                place: placeVal,
-                food: foodVal
-            });
+            history.unshift({ time: new Date().getTime(), text: text, title: aiData.diary_title, img: imgData, place: placeVal, food: foodVal });
             if(history.length > 50) history = history.slice(0, 50); 
             localStorage.setItem(DB_KEY, JSON.stringify(history));
         } catch(e) {
@@ -791,20 +705,21 @@
         renderRecipes(type);
     }
 
-    // --- 📥 時光庫與原生下載 ---
+    // --- 📥 時光庫與多重冷歸檔融合引擎 ---
     function getHis() {
+        // 重置為熱快取模式
+        memoryArchiveData = null; 
+        
         let his = document.getElementById('his'); his.innerHTML = ""; document.getElementById('his-load').style.display = 'block'; 
         setTimeout(() => {
             let history = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
             his.innerHTML = history.map(i => {
-                
                 let imgHtml = i.img ? `
                     <div style="margin-top:15px;">
                         <img src="${i.img}" style="width:100%; max-width:400px; border-radius:12px; display:block; margin-bottom:10px; border:1px solid #EEE;">
                         <a href="${i.img}" download="Nanny-Memory-${i.time}.jpg" style="display:inline-block; background:linear-gradient(135deg, #3498DB, #2980B9); color:white; padding:10px 18px; border-radius:10px; font-size:14px; text-decoration:none; font-weight:700; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); transition: 0.2s;">
                             📥 點擊下載相片至裝置
                         </a>
-                        <div style="font-size:11px; color:#95A5A6; margin-top:5px;">*若 iOS 無法直接下載，請長按圖片選擇「儲存照片」</div>
                     </div>` : '';
 
                 let placeHtml = i.place ? `<span class="highlight-badge">📍 ${i.place}</span>` : '';
@@ -821,13 +736,11 @@
         }, 500);
     }
 
-    // --- 📦 冷歸檔資料庫與智慧合併同步模組 (Cold Archive & Smart Merge) ---
-
     // 輔助函數：時間戳記無損去重合併
     function mergeHistoryData(localData, importedData) {
         const recordMap = new Map();
         localData.forEach(item => recordMap.set(item.time, item));
-        importedData.forEach(item => recordMap.set(item.time, item)); // 相同時間戳則覆蓋更新，不同則追加
+        importedData.forEach(item => recordMap.set(item.time, item)); 
         const mergedList = Array.from(recordMap.values());
         mergedList.sort((a, b) => b.time - a.time);
         return mergedList;
@@ -858,7 +771,7 @@
                 let currentData = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
                 let merged = mergeHistoryData(currentData, importedData);
                 
-                localStorage.setItem(DB_KEY, JSON.stringify(merged.slice(0, 50))); // 維持50筆活躍快取
+                localStorage.setItem(DB_KEY, JSON.stringify(merged.slice(0, 50))); 
                 showT(`✅ 成功合併！共整合 ${merged.length} 筆回憶 (保留最新50筆)`);
                 getHis();
             } catch (err) { showT("無效的備份檔案格式", "error"); }
@@ -890,37 +803,67 @@
         showT(`✅ 已封存 ${currentList.length} 筆資料，快取已釋放！請移至 Google Drive 保存。`);
     }
 
-    // 4. 純記憶體載入冷歸檔 (免寫入 LocalStorage)
+    // 4. 多重檔案非同步讀取與融合 (Multi-file Reader)
     function loadColdArchiveDirectly(input) {
-        if (!input.files || !input.files[0]) return;
-        let file = input.files[0];
-        let reader = new FileReader();
+        if (!input.files || input.files.length === 0) return;
         
         document.getElementById('his-load').style.display = 'block';
         
-        reader.onload = function(e) {
-            try {
-                let coldData = JSON.parse(e.target.result);
-                if (!Array.isArray(coldData)) throw new Error();
-                renderArchiveToUI(coldData, file.name);
-                showT(`📂 從 [${file.name}] 載入 ${coldData.length} 筆封存紀錄！`);
-            } catch (err) {
-                showT("封存檔案格式不符", "error");
-            } finally {
-                document.getElementById('his-load').style.display = 'none';
-                input.value = '';
-            }
-        };
-        reader.readAsText(file);
+        let allColdData = []; 
+        let filesRead = 0;
+        let fileNames = [];
+        let totalFiles = input.files.length;
+
+        Array.from(input.files).forEach(file => {
+            fileNames.push(file.name);
+            let reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    let data = JSON.parse(e.target.result);
+                    if (Array.isArray(data)) {
+                        allColdData = allColdData.concat(data); 
+                    }
+                } catch (err) {
+                    console.error("檔案格式錯誤:", file.name);
+                } finally {
+                    filesRead++;
+                    if (filesRead === totalFiles) {
+                        processAndRenderColdData(allColdData, fileNames);
+                        input.value = ''; 
+                    }
+                }
+            };
+            reader.readAsText(file);
+        });
     }
 
-    // 5. 渲染冷封存資料檢視畫面 (特殊 UI)
+    // 5. 處理融合資料、寫入記憶體並渲染 (In-Memory Processing)
+    function processAndRenderColdData(dataList, fileNames) {
+        const recordMap = new Map();
+        dataList.forEach(item => recordMap.set(item.time, item));
+        
+        let mergedList = Array.from(recordMap.values());
+        mergedList.sort((a, b) => b.time - a.time);
+
+        let namesStr = fileNames.length > 2 
+            ? `${fileNames[0]} 等 ${fileNames.length} 個檔案` 
+            : fileNames.join('、');
+
+        // 🔥 關鍵：將海量資料存入全域變數，供 AI 天賦掃描使用
+        memoryArchiveData = mergedList;
+
+        renderArchiveToUI(mergedList, namesStr);
+        showT(`📂 成功從 ${fileNames.length} 個檔案載入 ${mergedList.length} 筆紀錄！`);
+        document.getElementById('his-load').style.display = 'none';
+    }
+
     function renderArchiveToUI(dataList, sourceFileName) {
         let his = document.getElementById('his');
         his.innerHTML = `
             <div style="background: #EBF5FB; border-left: 5px solid #3498DB; padding: 12px; margin-bottom: 15px; border-radius: 8px; font-size: 13.5px; color: #2C3E50;">
-                <b>📂 檢視封存包：</b>${sourceFileName}<br>
-                <span style="font-size: 12px; color: #7F8C8D;">(純記憶體模式，共 ${dataList.length} 筆，未寫入快取)</span>
+                <b>📂 檢視全量封存包：</b><br>${sourceFileName}<br>
+                <span style="font-size: 12px; color: #7F8C8D;">(純記憶體模式，共 ${dataList.length} 筆，已準備好供 AI 掃描)</span>
             </div>
         ` + dataList.map(i => {
             let imgHtml = i.img ? `
@@ -944,7 +887,7 @@
         }).join('');
     }
 
-    // --- 🧬 創新功能：多元智能與天賦預測 (Talent Scan) ---
+    // --- 🧬 創新功能：全量大數據多元智能天賦預測 (Talent Scan) ---
     function initBadges() {
         document.getElementById('badge-container').innerHTML = badgeData.map(b => 
             `<div class="badge-item" id="bdg-${b.id}"><div class="badge-icon">${b.icon}<div class="badge-count" id="cnt-${b.id}" style="display:none;">0</div></div><div class="badge-name">${b.name}</div></div>`
@@ -955,7 +898,8 @@
         document.getElementById('scanBtn').disabled = true; document.getElementById('scan-load').style.display = 'block';
         
         setTimeout(() => {
-            let history = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+            // 🔥 核心聯動：如果使用者載入了冷歸檔(在記憶體中)，就掃描海量冷資料，否則掃描本地快取
+            let history = memoryArchiveData || JSON.parse(localStorage.getItem(DB_KEY) || '[]');
             
             let langScore = 0, motorScore = 0, cogScore = 0, socScore = 0;
             let badgeCounts = {};
@@ -999,7 +943,7 @@
             if(document.getElementById('txt-soc')) document.getElementById('txt-soc').innerText = `Lv.${Math.floor(cap(socScore)/10)}`;
             
             let totalLv = Math.floor((langScore + motorScore + cogScore + socScore) / 20);
-            let title = totalLv > 15 ? '蒙特梭利達人' : (totalLv > 5 ? '探索冒險家' : '幼兒園新生');
+            let title = totalLv > 15 ? '蒙特梭利大師' : (totalLv > 5 ? '探索冒險家' : '幼兒園新生');
             if(document.getElementById('main-level')) document.getElementById('main-level').innerHTML = `Lv. ${totalLv} <span>${title}</span>`;
 
             let maxTalent = 'spatial';
@@ -1007,13 +951,15 @@
             for (let key in talents) { if (talents[key] > maxVal) { maxVal = talents[key]; maxTalent = key; } }
             
             let talentMsg = "";
+            let scanSource = memoryArchiveData ? "【全年度冷歸檔資料庫】" : "【近期活躍熱快取】";
+            
             if (maxVal === 0) {
-                talentMsg = "歷史資料尚不足分析。請多使用【食材快搜】與【地點快搜】持續記錄，AI 將為您解鎖潛能報告！";
+                talentMsg = `目前基於${scanSource}的資料尚不足分析顯著天賦。請持續使用【食材】與【地點】標籤記錄。`;
             } else {
-                if (maxTalent === 'spatial') talentMsg = "<b>🎨 空間視覺智能 (Visual-Spatial) 突出！</b><br>大數據發現寶寶在建構上極具潛力！建議提供開放式建構玩具（如磁力片）。";
-                else if (maxTalent === 'kinesthetic') talentMsg = "<b>🏃 肢體動覺智能 (Bodily-Kinesthetic) 突出！</b><br>顯示極佳粗大肌肉協調性。建議多引導戶外障礙賽，將動能轉為腦神經連結。";
-                else if (maxTalent === 'linguistic') talentMsg = "<b>🗣️ 語文智能 (Linguistic) 突出！</b><br>對語言極度敏感，正是引入高階繪本共讀的黃金期。";
-                else if (maxTalent === 'interpersonal') talentMsg = "<b>🤝 人際內省智能 (Interpersonal) 突出！</b><br>對情緒非常敏銳，賦予他更多家事「小幫手」任務能建立強大責任感。";
+                if (maxTalent === 'spatial') talentMsg = `<b>🎨 空間視覺智能 (Visual-Spatial) 突出！</b><br>AI 掃描${scanSource}發現，寶寶在建構與視覺記憶上極具潛力！建議提供開放式建構玩具（如磁力片）。`;
+                else if (maxTalent === 'kinesthetic') talentMsg = `<b>🏃 肢體動覺智能 (Bodily-Kinesthetic) 突出！</b><br>AI 掃描${scanSource}顯示其極佳粗大肌肉協調性。建議多引導戶外障礙賽，將動能轉為腦神經連結。`;
+                else if (maxTalent === 'linguistic') talentMsg = `<b>🗣️ 語文智能 (Linguistic) 突出！</b><br>AI 掃描${scanSource}判斷寶寶對語言極度敏感，這正是引入高階繪本共讀的黃金期。`;
+                else if (maxTalent === 'interpersonal') talentMsg = `<b>🤝 人際內省智能 (Interpersonal) 突出！</b><br>AI 掃描${scanSource}指出寶寶對情緒非常敏銳，賦予他更多家事「小幫手」任務能建立強大責任感。`;
             }
 
             if(document.getElementById('talent-content')) document.getElementById('talent-content').innerHTML = talentMsg;
@@ -1022,7 +968,7 @@
             if(document.getElementById('scanBtn')) document.getElementById('scanBtn').style.display = 'none';
             if(document.getElementById('scan-load')) document.getElementById('scan-load').style.display = 'none';
             
-            showT("🧬 AI 多元智能分析完成！");
+            showT("🧬 全量 AI 多元智能分析完成！");
         }, 800);
     }
 </script>
