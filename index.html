@@ -299,17 +299,33 @@
             </div>
         </div>
 
-        <!-- 分頁 4: 歷史庫 -->
+        <!-- 分頁 4: 歷史庫 (搭載冷歸檔系統) -->
         <div id="t-mem" class="tab">
             <div class="card">
                 <div class="title-txt">💾 雲端時光庫 (本地加密)</div>
-                <button class="btn" onclick="getHis()" style="background: #34495E; margin-bottom:15px;">🔄 載入歷史紀錄</button>
-                <div style="display:flex; gap:10px; margin-bottom: 15px;">
-                    <button class="btn" onclick="exportData()" style="flex:1; background: #27AE60; font-size:14px; padding:12px;">📥 備份匯出</button>
-                    <label class="btn" style="flex:1; background: #E67E22; font-size:14px; padding:12px; margin:0;">
-                        📤 還原資料 <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(this)">
+                <button class="btn" onclick="getHis()" style="background: #34495E; margin-bottom:15px;">🔄 載入最新熱快取紀錄</button>
+                
+                <div style="display:flex; gap:10px; margin-bottom: 25px;">
+                    <button class="btn" onclick="exportData()" style="flex:1; background: #27AE60; font-size:14px; padding:12px;">📥 備份最新紀錄</button>
+                    <label class="btn" style="flex:1; background: #E67E22; font-size:14px; padding:12px; margin:0; text-align:center;">
+                        📤 智慧合併同步 <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(this)">
                     </label>
                 </div>
+
+                <!-- 📦 雲端冷歸檔 (無限容量) 面板 -->
+                <div style="background: #FAF9FC; border: 2px dashed #9B59B6; padding: 16px; border-radius: 15px; margin-bottom: 20px;">
+                    <div style="color: #8E44AD; font-weight: 800; margin-bottom: 10px; font-size: 15px;">📦 雲端冷歸檔 (無限容量管理)</div>
+                    <div style="font-size: 13px; color: #7F8C8D; margin-bottom: 14px; line-height: 1.5;">
+                        支援 Google Drive / iCloud 檔案映射。將舊資料打包釋放手機空間，或免寫入快取直接載入舊檔進行全量回顧。
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn" onclick="archiveAndResetHotCache()" style="flex:1; background: #8E44AD; font-size:13px; padding:10px;">📦 封存並清空快取</button>
+                        <label class="btn" style="flex:1; background: #34495E; font-size:13px; padding:10px; margin:0; text-align:center;">
+                            📂 載入封存包瀏覽 <input type="file" accept=".json" style="display:none;" onchange="loadColdArchiveDirectly(this)">
+                        </label>
+                    </div>
+                </div>
+
                 <div id="his-load" class="loader">⏳ 讀取中...</div>
                 <div id="his"></div>
             </div>
@@ -327,7 +343,6 @@
 <script>
     // =================================================================
     // 🗄️ 大數據區塊 1：雙語食材與營養字典 (Bilingual Food DB)
-    // 深度研究：3-6歲幼兒黃金食材
     // =================================================================
     const foodDictionary = [
         { tw: '蘋果', en: 'Apple', tag: '腸腦軸線/纖維' },
@@ -485,6 +500,7 @@
     ];
 
     const PIN = '2023'; 
+    const DB_KEY = 'babyHistory_FlagshipV3'; // 更新資料庫 Key 避免衝突
     let ep = "", compressedBase64 = "", activeTags = [];
 
     window.onload = () => { 
@@ -575,15 +591,13 @@
         let q = val.toLowerCase();
         let matches = [];
         
-        // 1. 搜尋內建專業食材庫
         foodDictionary.forEach(f => {
             if (f.tw.includes(q) || f.en.toLowerCase().includes(q)) {
                 matches.push({ type: 'dict', text: f.tw, tag: f.tag });
             }
         });
         
-        // 2. 搜尋歷史紀錄中手動輸入過的食材 (簡單提取)
-        let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
+        let history = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
         let pastFoods = [...new Set(history.map(h => h.food).filter(f => f))];
         pastFoods.forEach(pf => {
             if (pf.toLowerCase().includes(q) && !matches.some(m => m.text === pf)) {
@@ -600,7 +614,6 @@
             `).join('');
             box.style.display = 'block';
         } else {
-            // 提供新增選項
             box.innerHTML = `<div class="suggestion-item" onclick="selectFood('${val}', '自訂食材')">➕ 新增自訂食材: "${val}"</div>`;
             box.style.display = 'block';
         }
@@ -608,7 +621,7 @@
     
     function selectFood(val, tag) {
         addTextTag(`${val}(${tag})`);
-        document.getElementById('foodInput').value = ''; // 選完清空
+        document.getElementById('foodInput').value = ''; 
         document.getElementById('foodSuggestions').style.display = 'none';
         showT(`已加入食材：${val}`);
     }
@@ -618,7 +631,7 @@
         let box = document.getElementById('placeSuggestions');
         if (!val.trim()) { box.style.display = 'none'; return; }
         
-        let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
+        let history = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
         let places = [...new Set(history.map(h => h.place).filter(p => p))]; 
         
         let matches = places.filter(p => p.toLowerCase().includes(val.toLowerCase()));
@@ -636,7 +649,6 @@
         document.getElementById('placeSuggestions').style.display = 'none';
     }
     
-    // 點擊空白處關閉提示框
     document.addEventListener('click', function(e) {
         if(!e.target.closest('#placeInput')) {
             let pBox = document.getElementById('placeSuggestions');
@@ -657,7 +669,6 @@
         mockAIDatabase.forEach(data => {
             let score = 0;
             data.keywords.forEach(kw => {
-                // 如果點擊了專屬標籤，權重加乘 5 倍，精準命中！
                 if (tags.some(t => t.str.includes(kw))) score += 5; 
                 else if (combinedText.includes(kw)) score += 1;
             });
@@ -667,9 +678,8 @@
             }
         });
         
-        // 聯動食譜庫
         let linkedRecipe = recipeDatabase.find(r => r.id === bestMatch.recipe_id);
-        if(!linkedRecipe) linkedRecipe = recipeDatabase[0]; // fallback
+        if(!linkedRecipe) linkedRecipe = recipeDatabase[0]; 
         
         return { ...JSON.parse(JSON.stringify(bestMatch)), full_recipe: linkedRecipe }; 
     }
@@ -685,7 +695,6 @@
         setTimeout(() => {
             const v = getMockData(activeTags, txt);
             
-            // 寫入分析面板
             document.getElementById('r-tag').innerText = "📝 " + v.diary_title; 
             document.getElementById('r-beh').innerText = "系統已完成語意特徵與神經科學分析。"; 
             document.getElementById('r-psy').innerText = v.psy_analysis; 
@@ -708,7 +717,6 @@
 
             saveToLocalDB(txt, v, compressedBase64);
 
-            // UI Reset
             document.getElementById('txt').value = ''; 
             document.getElementById('placeInput').value = ''; 
             document.getElementById('foodInput').value = ''; 
@@ -721,11 +729,10 @@
 
     function saveToLocalDB(text, aiData, imgData) {
         let placeVal = document.getElementById('placeInput').value.trim();
-        // 抓取剛剛輸入的食材，用於自建字典
         let foodVal = document.getElementById('foodInput').value.trim();
         
         try {
-            let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
+            let history = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
             history.unshift({
                 time: new Date().getTime(),
                 text: text,
@@ -735,12 +742,12 @@
                 food: foodVal
             });
             if(history.length > 50) history = history.slice(0, 50); 
-            localStorage.setItem('babyHistory_FlagshipV2', JSON.stringify(history));
+            localStorage.setItem(DB_KEY, JSON.stringify(history));
         } catch(e) {
             if (e.name === 'QuotaExceededError') {
-                let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
+                let history = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
                 history = history.slice(0, Math.floor(history.length / 2));
-                localStorage.setItem('babyHistory_FlagshipV2', JSON.stringify(history));
+                localStorage.setItem(DB_KEY, JSON.stringify(history));
                 showT("記憶體已滿，自動清理舊紀錄！", "error");
             }
         }
@@ -788,10 +795,9 @@
     function getHis() {
         let his = document.getElementById('his'); his.innerHTML = ""; document.getElementById('his-load').style.display = 'block'; 
         setTimeout(() => {
-            let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
+            let history = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
             his.innerHTML = history.map(i => {
                 
-                // 完美的 HTML5 原生下載按鈕
                 let imgHtml = i.img ? `
                     <div style="margin-top:15px;">
                         <img src="${i.img}" style="width:100%; max-width:400px; border-radius:12px; display:block; margin-bottom:10px; border:1px solid #EEE;">
@@ -801,7 +807,6 @@
                         <div style="font-size:11px; color:#95A5A6; margin-top:5px;">*若 iOS 無法直接下載，請長按圖片選擇「儲存照片」</div>
                     </div>` : '';
 
-                // 📍 地點藍色徽章顯示
                 let placeHtml = i.place ? `<span class="highlight-badge">📍 ${i.place}</span>` : '';
 
                 return `<div style="background:#fff; border:1px solid #E5E8E8; padding:20px; margin-bottom:20px; border-radius:18px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
@@ -811,37 +816,132 @@
                     <div style="font-weight:800;color:var(--p);font-size:18px;">${i.title}</div>
                     <div style="font-size:15px; margin-top:10px; color:#555; white-space:pre-wrap; line-height: 1.6;">${i.text}</div>
                     ${imgHtml}</div>`;
-            }).join('') || "<div style='text-align:center; padding:30px; color:#95A5A6;'>雲端時光庫尚無資料，請先前往記錄日常。</div>";
+            }).join('') || "<div style='text-align:center; padding:30px; color:#95A5A6;'>雲端時光庫尚無快取資料，請先前往記錄或載入封存包。</div>";
             document.getElementById('his-load').style.display = 'none';
         }, 500);
     }
 
-    // --- 備份與還原功能 ---
+    // --- 📦 冷歸檔資料庫與智慧合併同步模組 (Cold Archive & Smart Merge) ---
+
+    // 輔助函數：時間戳記無損去重合併
+    function mergeHistoryData(localData, importedData) {
+        const recordMap = new Map();
+        localData.forEach(item => recordMap.set(item.time, item));
+        importedData.forEach(item => recordMap.set(item.time, item)); // 相同時間戳則覆蓋更新，不同則追加
+        const mergedList = Array.from(recordMap.values());
+        mergedList.sort((a, b) => b.time - a.time);
+        return mergedList;
+    }
+
+    // 1. 備份最新紀錄 (熱快取匯出)
     function exportData() {
-        let history = localStorage.getItem('babyHistory_FlagshipV2');
-        if (!history || history === '[]') return document.getElementById('toast-msg').innerText="沒有資料可以備份", document.getElementById('toast').className="show", setTimeout(()=>document.getElementById('toast').className="",3000);
+        let history = localStorage.getItem(DB_KEY);
+        if (!history || history === '[]') return showT("沒有資料可以備份", "error");
         let blob = new Blob([history], { type: "application/json" });
         let url = URL.createObjectURL(blob);
         let a = document.createElement('a');
-        a.href = url; a.download = `育兒大數據備份_${new Date().getTime()}.json`;
+        let dateStr = new Date().toISOString().slice(0, 10);
+        a.href = url; a.download = `Baby_HotCache_${dateStr}.json`;
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         showT("✅ 備份檔已成功下載！");
     }
 
+    // 2. 智慧合併同步 (多裝置共享)
     function importData(input) {
         if (!input.files || !input.files[0]) return;
         let reader = new FileReader();
         reader.onload = function(e) {
             try {
-                let data = JSON.parse(e.target.result);
-                if (Array.isArray(data)) {
-                    localStorage.setItem('babyHistory_FlagshipV2', JSON.stringify(data));
-                    showT("✅ 資料還原成功！請重新點擊載入");
-                    getHis();
-                } else throw new Error();
-            } catch (err) { showT("無效的備份檔案", "error"); }
+                let importedData = JSON.parse(e.target.result);
+                if (!Array.isArray(importedData)) throw new Error();
+                
+                let currentData = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+                let merged = mergeHistoryData(currentData, importedData);
+                
+                localStorage.setItem(DB_KEY, JSON.stringify(merged.slice(0, 50))); // 維持50筆活躍快取
+                showT(`✅ 成功合併！共整合 ${merged.length} 筆回憶 (保留最新50筆)`);
+                getHis();
+            } catch (err) { showT("無效的備份檔案格式", "error"); }
+            input.value = '';
         };
         reader.readAsText(input.files[0]);
+    }
+
+    // 3. 封存並清空熱快取 (冷歸檔建立)
+    function archiveAndResetHotCache() {
+        let history = localStorage.getItem(DB_KEY);
+        if (!history || history === '[]') return showT("目前快取中無資料可封存", "error");
+
+        let currentList = JSON.parse(history);
+        let dateStr = new Date().toISOString().slice(0, 10);
+        
+        let blob = new Blob([history], { type: "application/json;charset=utf-8" });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = `Baby_Archive_${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        localStorage.removeItem(DB_KEY);
+        getHis();
+        showT(`✅ 已封存 ${currentList.length} 筆資料，快取已釋放！請移至 Google Drive 保存。`);
+    }
+
+    // 4. 純記憶體載入冷歸檔 (免寫入 LocalStorage)
+    function loadColdArchiveDirectly(input) {
+        if (!input.files || !input.files[0]) return;
+        let file = input.files[0];
+        let reader = new FileReader();
+        
+        document.getElementById('his-load').style.display = 'block';
+        
+        reader.onload = function(e) {
+            try {
+                let coldData = JSON.parse(e.target.result);
+                if (!Array.isArray(coldData)) throw new Error();
+                renderArchiveToUI(coldData, file.name);
+                showT(`📂 從 [${file.name}] 載入 ${coldData.length} 筆封存紀錄！`);
+            } catch (err) {
+                showT("封存檔案格式不符", "error");
+            } finally {
+                document.getElementById('his-load').style.display = 'none';
+                input.value = '';
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // 5. 渲染冷封存資料檢視畫面 (特殊 UI)
+    function renderArchiveToUI(dataList, sourceFileName) {
+        let his = document.getElementById('his');
+        his.innerHTML = `
+            <div style="background: #EBF5FB; border-left: 5px solid #3498DB; padding: 12px; margin-bottom: 15px; border-radius: 8px; font-size: 13.5px; color: #2C3E50;">
+                <b>📂 檢視封存包：</b>${sourceFileName}<br>
+                <span style="font-size: 12px; color: #7F8C8D;">(純記憶體模式，共 ${dataList.length} 筆，未寫入快取)</span>
+            </div>
+        ` + dataList.map(i => {
+            let imgHtml = i.img ? `
+                <div style="margin-top:15px;">
+                    <img src="${i.img}" style="width:100%; max-width:400px; border-radius:12px; display:block; margin-bottom:10px; border:1px solid #EEE;">
+                    <a href="${i.img}" download="Archive-${i.time}.jpg" style="display:inline-block; background:linear-gradient(135deg, #3498DB, #2980B9); color:white; padding:10px 18px; border-radius:10px; font-size:14px; text-decoration:none; font-weight:700; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);">
+                        📥 下載原圖
+                    </a>
+                </div>` : '';
+            let placeHtml = i.place ? `<span class="highlight-badge">📍 ${i.place}</span>` : '';
+            
+            return `
+                <div style="background:#fff; border:1px solid #E5E8E8; padding:20px; margin-bottom:20px; border-radius:18px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                    <div style="font-size:12px;color:#95A5A6; margin-bottom:10px; font-weight:bold;">
+                        ${placeHtml} ${new Date(i.time).toLocaleString()}
+                    </div>
+                    <div style="font-weight:800;color:var(--p);font-size:18px;">${i.title}</div>
+                    <div style="font-size:15px; margin-top:10px; color:#555; white-space:pre-wrap; line-height: 1.6;">${i.text}</div>
+                    ${imgHtml}
+                </div>`;
+        }).join('');
     }
 
     // --- 🧬 創新功能：多元智能與天賦預測 (Talent Scan) ---
@@ -855,25 +955,21 @@
         document.getElementById('scanBtn').disabled = true; document.getElementById('scan-load').style.display = 'block';
         
         setTimeout(() => {
-            let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
+            let history = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
             
             let langScore = 0, motorScore = 0, cogScore = 0, socScore = 0;
             let badgeCounts = {};
             badgeData.forEach(b => badgeCounts[b.id] = 0);
 
-            // 天賦因子追蹤 (Howard Gardner Multiple Intelligences)
             let talents = { spatial: 0, kinesthetic: 0, linguistic: 0, interpersonal: 0 };
 
             history.forEach(h => {
                 let text = (h.text + h.title + (h.place||'') + (h.food||'')).toLowerCase();
                 
-                // 基礎能力
                 if (text.includes('讀') || text.includes('書') || text.includes('問') || text.includes('故事')) { langScore += 10; talents.linguistic += 1; }
                 if (text.includes('跑') || text.includes('公園') || text.includes('剪刀') || text.includes('積木')) { motorScore += 10; talents.kinesthetic += 1; }
                 if (text.includes('飯') || text.includes('自己') || text.includes('蘋果') || text.includes('魚') || text.includes('菜')) { cogScore += 10; }
                 if (text.includes('笑') || text.includes('哭') || text.includes('朋友') || text.includes('分享') || text.includes('情緒')) { socScore += 10; talents.interpersonal += 1; }
-                
-                // 空間智能
                 if (text.includes('畫') || text.includes('積木') || text.includes('勞作') || text.includes('拼圖')) { talents.spatial += 2; }
 
                 badgeData.forEach(b => {
@@ -883,7 +979,6 @@
                 });
             });
 
-            // 渲染徽章
             Object.keys(badgeCounts).forEach(id => {
                 if (badgeCounts[id] > 0) {
                     let bdg = document.getElementById(`bdg-${id}`);
@@ -893,7 +988,6 @@
                 }
             });
 
-            // 雷達能力條
             let cap = (val) => Math.min(val, 100);
             if(document.getElementById('lv-lang')) document.getElementById('lv-lang').style.width = cap(langScore) + '%';
             if(document.getElementById('txt-lang')) document.getElementById('txt-lang').innerText = `Lv.${Math.floor(cap(langScore)/10)}`;
@@ -908,7 +1002,6 @@
             let title = totalLv > 15 ? '蒙特梭利達人' : (totalLv > 5 ? '探索冒險家' : '幼兒園新生');
             if(document.getElementById('main-level')) document.getElementById('main-level').innerHTML = `Lv. ${totalLv} <span>${title}</span>`;
 
-            // 天賦分析結果
             let maxTalent = 'spatial';
             let maxVal = -1;
             for (let key in talents) { if (talents[key] > maxVal) { maxVal = talents[key]; maxTalent = key; } }
