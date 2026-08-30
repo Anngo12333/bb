@@ -57,13 +57,19 @@
     </script>
     <style>
         html { font-size: 16px; } 
-        body { background-color: #FAF4EB; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; margin: 0; padding: 0; color: #5C4033; }
+        body { 
+            background-color: #FAF4EB; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            overscroll-behavior-y: none; 
+            margin: 0; padding: 0; color: #5C4033; 
+        }
         ::-webkit-scrollbar { display: none; } * { -ms-overflow-style: none; scrollbar-width: none; }
         
         .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
         .pond-bg { background: linear-gradient(180deg, #FAF4EB 0%, #E3F2FD 100%); }
         
-        /* 蓮葉樣式 */
+        /* 蓮葉樣式 (放大版) */
         .lily-pad {
             position: absolute;
             background: #81C784;
@@ -73,10 +79,10 @@
             align-items: center;
             justify-content: center;
             transform-origin: center;
-            transition: all 0.3s;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
         }
-        .lily-pad:active { transform: scale(0.95); }
+        .lily-pad:active { transform: scale(0.9) !important; }
         .lily-pad::after {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%);
@@ -90,6 +96,9 @@
         .pass-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #C48A54; transition: 0.2s; }
         .pass-dot.filled { background: #C48A54; }
 
+        /* iOS 安全邊距 */
+        .safe-pb { padding-bottom: calc(85px + env(safe-area-inset-bottom)); }
+        .nav-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
 <body>
@@ -98,12 +107,23 @@
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback } = React;
 
-        // --- 簡易音效 ---
+        // --- 深度修復 iOS AudioContext ---
+        let sharedAudioCtx = null;
+        const initAudio = () => {
+            if (!sharedAudioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) sharedAudioCtx = new AudioContext();
+            }
+            if (sharedAudioCtx && sharedAudioCtx.state === 'suspended') {
+                sharedAudioCtx.resume();
+            }
+            return sharedAudioCtx;
+        };
+
         const playTone = (type = 'pop') => {
             try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return;
-                const ctx = new AudioContext();
+                const ctx = initAudio();
+                if (!ctx) return;
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
@@ -132,10 +152,11 @@
             } catch (e) {}
         };
 
-        // ---  SVG 圖示 ---
+        // --- SVG 圖示 ---
         const Icons = {
             Home: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
             Book: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>,
+            Gamepad: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4"></path><path d="M8 10v4"></path><path d="M15 13h.01"></path><path d="M18 11h.01"></path></svg>,
             Lock: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
             Plus: () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
             Close: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
@@ -165,13 +186,15 @@
             </svg>
         );
 
-        // --- 密碼鎖組件 (100% 離線防護) ---
+        // --- 密碼鎖組件 (移除了密碼提示文字) ---
         const LockScreen = ({ onUnlock }) => {
             const [input, setInput] = useState('');
             const [error, setError] = useState(false);
-            const CORRECT_PIN = 'caca'; // Default password "caca"
+            const CORRECT_PIN = 'caca';
 
             const handlePress = (val) => {
+                initAudio(); // 確保 iOS 解鎖音效
+                
                 if (val === 'del') {
                     setInput(prev => prev.slice(0, -1));
                     setError(false);
@@ -206,7 +229,7 @@
                     </div>
                     <h2 className="text-xl font-bold text-capy-text mb-8">請輸入密碼解鎖</h2>
                     
-                    <div className={`flex gap-4 mb-8 ${error ? 'animate-wiggle' : ''}`}>
+                    <div className={`flex gap-4 mb-10 ${error ? 'animate-wiggle' : ''}`}>
                         {[...Array(4)].map((_, i) => (
                             <div key={i} className={`pass-dot ${i < input.length ? 'filled' : ''} ${error ? 'border-red-500' : ''}`}></div>
                         ))}
@@ -214,7 +237,7 @@
 
                     <div className="keypad-grid">
                         {['a','b','c','d','e','f','g','h','i'].map((char) => (
-                            <button key={char} onClick={() => handlePress(char)} className="key-btn">{char.toUpperCase()}</button>
+                            <button key={char} onClick={() => handlePress(char)} className="key-btn shadow-sm">{char.toUpperCase()}</button>
                         ))}
                         <div></div>
                         <button onClick={() => handlePress('0')} className="key-btn invisible">0</button>
@@ -224,12 +247,103 @@
             );
         };
 
+        // --- 互動遊戲：水豚任務記憶大師 ---
+        const MemoryTaskGame = ({ tasks }) => {
+            const [cards, setCards] = useState([]);
+            const [flipped, setFlipped] = useState([]);
+            const [solved, setSolved] = useState([]);
+            const [comboMsg, setComboMsg] = useState('');
+
+            const emojis = ['💼', '🏠', '💡', '🏃', '🍎', '🦦'];
+            
+            useEffect(() => {
+                resetGame();
+            }, []);
+
+            const resetGame = () => {
+                const initialCards = [...emojis, ...emojis]
+                    .sort(() => Math.random() - 0.5)
+                    .map((icon, id) => ({ id, icon }));
+                setCards(initialCards);
+                setFlipped([]);
+                setSolved([]);
+                setComboMsg('');
+            };
+
+            const handleFlip = (index) => {
+                initAudio(); // 確保 iOS 音效
+                if (flipped.length === 2 || flipped.includes(index) || solved.includes(index)) return;
+                
+                const newFlipped = [...flipped, index];
+                setFlipped(newFlipped);
+                playTone('pop');
+
+                if (newFlipped.length === 2) {
+                    const match = cards[newFlipped[0]].icon === cards[newFlipped[1]].icon;
+                    if (match) {
+                        setSolved([...solved, ...newFlipped]);
+                        
+                        // 遊戲互動式提醒：從未完成的任務中隨機挑選
+                        const activeTasks = tasks.filter(t => !t.isTriggered);
+                        if (activeTasks.length > 0) {
+                            const randomTask = activeTasks[Math.floor(Math.random() * activeTasks.length)];
+                            setComboMsg(`✨ 溫馨提醒: ${randomTask.title}`);
+                        } else {
+                            setComboMsg(`✨ 太棒了！今天沒有未完成的任務！`);
+                        }
+                        
+                        playTone('success');
+                        setTimeout(() => setComboMsg(''), 3500);
+                    } else {
+                        setTimeout(() => playTone('error'), 100);
+                    }
+                    setTimeout(() => setFlipped([]), 800);
+                }
+            };
+
+            return (
+                <div className="flex-1 w-full h-full relative flex flex-col items-center pt-6 px-6 overflow-y-auto safe-pb">
+                    <div className="text-center mb-6">
+                        <h2 className="text-2xl font-black text-capy-text">任務記憶大師</h2>
+                        <p className="text-sm font-bold text-capy-light mt-1">配對成功將解鎖一則日常提醒！</p>
+                    </div>
+                    
+                    {comboMsg && (
+                        <div className="absolute top-24 bg-white/95 backdrop-blur-sm px-6 py-4 rounded-2xl shadow-xl border-2 border-capy-secondary text-capy-primary font-bold z-10 animate-pop-in text-center w-[85%] text-base">
+                            {comboMsg}
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-3 gap-4 w-full max-w-[300px]">
+                        {cards.map((card, i) => {
+                            const isFlipped = flipped.includes(i) || solved.includes(i);
+                            return (
+                                <div 
+                                    key={card.id} 
+                                    onClick={() => handleFlip(i)}
+                                    className={`h-24 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm flex items-center justify-center text-4xl select-none ${isFlipped ? 'bg-white border-2 border-capy-secondary scale-100' : 'bg-capy-primary border-b-4 border-[#B8815A] active:scale-95'}`}
+                                >
+                                    {isFlipped ? card.icon : '❓'}
+                                </div>
+                            );
+                        })}
+                    </div>
+                    
+                    {solved.length === cards.length && cards.length > 0 && (
+                        <div className="mt-8 animate-bounce-slow">
+                            <button onClick={resetGame} className="bg-capy-primary text-white font-black py-3 px-8 rounded-full shadow-lg active:scale-95 transition-transform text-base">再來一局</button>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         // --- 主應用程式 ---
         const App = () => {
             const [isLocked, setIsLocked] = useState(true);
             const [activeTab, setActiveTab] = useState('home');
             const [tasks, setTasks] = useState(() => {
-                try { return JSON.parse(localStorage.getItem('capy_offline_tasks')) || []; } catch(e) { return []; }
+                try { return JSON.parse(localStorage.getItem('capy_offline_tasks_v2')) || []; } catch(e) { return []; }
             });
             const [isSheetOpen, setIsSheetOpen] = useState(false);
             const [toastMsg, setToastMsg] = useState('');
@@ -250,16 +364,20 @@
 
             // 存儲機制
             useEffect(() => {
-                localStorage.setItem('capy_offline_tasks', JSON.stringify(tasks));
+                localStorage.setItem('capy_offline_tasks_v2', JSON.stringify(tasks));
             }, [tasks]);
 
             // 自動設定新增行程的時間為當前時間
             useEffect(() => {
                 if (isSheetOpen) {
                     const now = new Date();
+                    // 修復時區偏差，確保取得當地正確日期
                     const localDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
                     setDate(localDate);
-                    setTime(now.toTimeString().substring(0, 5));
+                    // 取得當前時間 HH:MM 格式
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    setTime(`${hours}:${minutes}`);
                 }
             }, [isSheetOpen]);
 
@@ -276,7 +394,9 @@
                     const now = new Date();
                     const currentLocalTime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
                     const currentDateStr = currentLocalTime.toISOString().split('T')[0];
-                    const currentTimeStr = now.toTimeString().substring(0, 5);
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    const currentTimeStr = `${hours}:${minutes}`;
 
                     const dueTask = tasks.find(t => 
                         t.date === currentDateStr && 
@@ -304,7 +424,9 @@
                 
                 const localDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
                 setDate(localDate);
-                setTime(now.toTimeString().substring(0, 5));
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                setTime(`${hours}:${minutes}`);
                 playTone('pop');
             };
 
@@ -320,30 +442,30 @@
                     isTriggered: false
                 };
                 setTasks(prev => [...prev, newTask].sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`)));
-                setTitle(''); setCategory(''); setIsSheetOpen(false);
+                setTitle(''); setCategory(''); setIsSheetOpen(false); setActiveTab('home');
                 showT('✨ 提醒已儲存 (100% 離線)');
                 playTone('success');
             };
 
-            // --- AI 水花池塘渲染 (視覺化提醒) ---
+            // --- AI 水花池塘渲染 (視覺化提醒，放大版) ---
             const renderLilyPads = () => {
                 const activeTasks = tasks.filter(t => !t.isTriggered).slice(0, 8); // 最多顯示 8 個
                 if (activeTasks.length === 0) return null;
 
                 return activeTasks.map((task, index) => {
-                    // 簡單的隨機散佈邏輯
-                    const top = 15 + Math.abs(Math.sin(index * 123) * 60) + '%';
-                    const left = 10 + Math.abs(Math.cos(index * 321) * 70) + '%';
+                    // 散佈邏輯
+                    const top = 10 + Math.abs(Math.sin(index * 123) * 65) + '%';
+                    const left = 5 + Math.abs(Math.cos(index * 321) * 75) + '%';
                     const catObj = categories.find(c => c.id === task.category) || categories[2];
-                    const delay = (index * 0.5) + 's';
+                    const delay = (index * 0.4) + 's';
                     
-                    // 根據文字長度決定大小，將整體尺寸放大以增添可愛感與可讀性
-                    const size = Math.max(100, Math.min(160, 80 + task.title.length * 10));
+                    // 根據文字長度決定大小，整體明顯放大
+                    const size = Math.max(120, Math.min(180, 100 + task.title.length * 8));
 
                     return (
                         <div 
                             key={task.id}
-                            className={`lily-pad ${index % 2 === 0 ? 'animate-float' : 'animate-float-delayed'} absolute shadow-lg`}
+                            className={`lily-pad ${index % 2 === 0 ? 'animate-float' : 'animate-float-delayed'} absolute shadow-lg select-none`}
                             style={{ 
                                 top, left, 
                                 width: `${size}px`, height: `${size}px`,
@@ -354,9 +476,9 @@
                                 playTone('pop');
                             }}
                         >
-                            <div className="text-center p-3 text-white drop-shadow-md flex flex-col items-center justify-center w-full h-full">
-                                <span className="text-4xl mb-2 drop-shadow-lg">{catObj.icon}</span>
-                                <span className="text-[13px] font-bold leading-snug line-clamp-2 w-full px-2 break-words">
+                            <div className="text-center p-3 text-white drop-shadow-md flex flex-col items-center justify-center w-full h-full pointer-events-none">
+                                <span className="text-[40px] mb-1 drop-shadow-lg">{catObj.icon}</span>
+                                <span className="text-[15px] font-bold leading-snug line-clamp-2 w-full px-2 break-words">
                                     {task.title}
                                 </span>
                             </div>
@@ -377,7 +499,7 @@
                         {toastMsg}
                     </div>
 
-                    <main className="flex-1 overflow-hidden flex flex-col pb-20">
+                    <main className="flex-1 overflow-hidden flex flex-col safe-pb">
                         {/* --- 首頁：水花池塘 --- */}
                         {activeTab === 'home' && (
                             <div className="h-full flex flex-col animate-pop-in relative pond-bg">
@@ -392,20 +514,20 @@
                                 </header>
 
                                 {/* 互動池塘區 */}
-                                <div className="flex-1 relative overflow-hidden mt-4">
+                                <div className="flex-1 relative overflow-hidden mt-2">
                                     {/* 裝飾波紋 */}
-                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full animate-ripple z-0"></div>
+                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full animate-ripple z-0"></div>
                                     
-                                    {/* 蓮葉提醒 */}
+                                    {/* 蓮葉提醒 (放大版) */}
                                     {renderLilyPads()}
 
                                     {/* 中央水豚 */}
                                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                                        <CuteCapyIcon className="w-36 h-36 drop-shadow-xl animate-sway" />
+                                        <CuteCapyIcon className="w-40 h-40 drop-shadow-xl animate-sway" />
                                     </div>
 
                                     {tasks.filter(t => !t.isTriggered).length === 0 && (
-                                        <div className="absolute bottom-20 w-full text-center text-capy-light/70 font-bold text-sm z-0">
+                                        <div className="absolute bottom-24 w-full text-center text-capy-light/80 font-bold text-sm z-0">
                                             水面平靜...點擊下方「+」新增事項
                                         </div>
                                     )}
@@ -413,9 +535,16 @@
                             </div>
                         )}
 
+                        {/* --- 遊戲頁：記憶大師 --- */}
+                        {activeTab === 'game' && (
+                            <div className="h-full flex flex-col animate-pop-in bg-capy-header pt-10">
+                                <MemoryTaskGame tasks={tasks} />
+                            </div>
+                        )}
+
                         {/* --- 列表頁：詳細紀錄 --- */}
                         {activeTab === 'list' && (
-                            <div className="h-full flex flex-col animate-pop-in bg-white pt-10 px-6 overflow-y-auto pb-24">
+                            <div className="h-full flex flex-col animate-pop-in bg-white pt-10 px-6 overflow-y-auto">
                                 <h1 className="text-2xl font-black text-capy-text mb-6">所有事項庫</h1>
                                 {tasks.length === 0 ? (
                                     <div className="text-center opacity-50 mt-10"><p className="font-bold">尚無紀錄</p></div>
@@ -436,7 +565,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <button onClick={() => handleDelete(task.id)} className="p-2 text-gray-300 hover:text-red-400 active:scale-90 transition-transform">
+                                                    <button onClick={() => handleDeleteTask(task.id)} className="p-2 text-gray-300 hover:text-red-400 active:scale-90 transition-transform">
                                                         <Icons.Trash />
                                                     </button>
                                                 </div>
@@ -449,12 +578,18 @@
                     </main>
 
                     {/* --- 底部導航列 --- */}
-                    <nav className="absolute bottom-0 w-full h-20 bg-white/90 backdrop-blur-md rounded-t-[2rem] shadow-[0_-5px_30px_rgba(0,0,0,0.05)] flex justify-around items-center px-8 z-20 border-t border-gray-100">
-                        <button onClick={() => { setActiveTab('home'); playTone('pop'); }} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'home' ? 'text-capy-primary' : 'text-gray-300'}`}>
+                    <nav className="absolute bottom-0 w-full bg-white/90 backdrop-blur-md rounded-t-[2rem] shadow-[0_-5px_30px_rgba(0,0,0,0.05)] flex justify-around items-center px-6 z-20 border-t border-gray-100 nav-safe pt-3 pb-3">
+                        <button onClick={() => { setActiveTab('home'); playTone('pop'); }} className={`flex flex-col items-center gap-1 p-2 w-16 transition-colors ${activeTab === 'home' ? 'text-capy-primary' : 'text-gray-300'}`}>
                             <Icons.Home />
+                            <span className="text-[10px] font-bold">首頁</span>
                         </button>
 
-                        <div className="relative -top-6">
+                        <button onClick={() => { setActiveTab('game'); playTone('pop'); }} className={`flex flex-col items-center gap-1 p-2 w-16 transition-colors ${activeTab === 'game' ? 'text-capy-primary' : 'text-gray-300'}`}>
+                            <Icons.Gamepad />
+                            <span className="text-[10px] font-bold">遊戲</span>
+                        </button>
+
+                        <div className="relative -top-8 mx-2">
                             <button 
                                 onClick={() => { setIsSheetOpen(true); playTone('pop'); }}
                                 className="bg-capy-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-capy-primary/30 hover:brightness-105 active:scale-90 transition-transform border-4 border-white"
@@ -463,12 +598,13 @@
                             </button>
                         </div>
 
-                        <button onClick={() => { setActiveTab('list'); playTone('pop'); }} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'list' ? 'text-capy-primary' : 'text-gray-300'}`}>
+                        <button onClick={() => { setActiveTab('list'); playTone('pop'); }} className={`flex flex-col items-center gap-1 p-2 w-16 transition-colors ${activeTab === 'list' ? 'text-capy-primary' : 'text-gray-300'}`}>
                             <Icons.Book />
+                            <span className="text-[10px] font-bold">紀錄</span>
                         </button>
                     </nav>
 
-                    {/* --- 新增行程 Bottom Sheet (深度優化版) --- */}
+                    {/* --- 新增行程 Bottom Sheet --- */}
                     {isSheetOpen && (
                         <div className="absolute inset-0 z-40 flex flex-col justify-end">
                             <div className="absolute inset-0 bg-capy-text/30 backdrop-blur-sm transition-opacity" onClick={() => setIsSheetOpen(false)}></div>
@@ -482,13 +618,13 @@
                                 <form onSubmit={handleAddTask} className="space-y-5">
                                     {/* 智能分類標籤 */}
                                     <div>
-                                        <label className="block text-xs font-bold text-capy-light mb-2">分類</label>
+                                        <label className="block text-sm font-bold text-capy-light mb-2">分類</label>
                                         <div className="flex gap-2">
                                             {categories.map(cat => (
                                                 <button 
                                                     key={cat.id} type="button" 
                                                     onClick={() => { setCategory(cat.id); playTone('pop'); }}
-                                                    className={`flex-1 py-2 rounded-xl text-sm font-bold border transition-all ${category === cat.id ? cat.color + ' scale-105 shadow-sm' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
+                                                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-all ${category === cat.id ? cat.color + ' scale-105 shadow-sm' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
                                                 >
                                                     {cat.icon} {cat.name}
                                                 </button>
@@ -497,33 +633,33 @@
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-capy-light mb-2">事項內容</label>
+                                        <label className="block text-sm font-bold text-capy-light mb-2">事項內容</label>
                                         <input 
                                             type="text" value={title} onChange={e => setTitle(e.target.value)} 
                                             placeholder="例如：整理報表、買牛奶..." 
-                                            className="w-full bg-capy-bg rounded-xl px-4 py-3.5 outline-none font-medium text-capy-text focus:ring-2 focus:ring-capy-primary/50 border border-transparent focus:border-capy-primary/30 transition-all" 
+                                            className="w-full bg-capy-bg rounded-xl px-4 py-3.5 outline-none font-medium text-capy-text focus:ring-2 focus:ring-capy-primary/50 border border-transparent focus:border-capy-primary/30 transition-all text-base" 
                                             required 
                                         />
                                     </div>
 
                                     <div className="flex gap-3">
                                         <div className="flex-1">
-                                            <label className="block text-xs font-bold text-capy-light mb-2">日期</label>
-                                            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-capy-bg rounded-xl px-4 py-3 outline-none font-medium text-capy-text border border-transparent focus:ring-2 focus:ring-capy-primary/50" required />
+                                            <label className="block text-sm font-bold text-capy-light mb-2">日期</label>
+                                            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-capy-bg rounded-xl px-4 py-3 outline-none font-medium text-capy-text border border-transparent focus:ring-2 focus:ring-capy-primary/50 text-base" required />
                                         </div>
                                         <div className="flex-1">
-                                            <label className="block text-xs font-bold text-capy-light mb-2">時間</label>
-                                            <input type="time" value={time} onChange={e => setTime(e.target.value)} className="w-full bg-capy-bg rounded-xl px-4 py-3 outline-none font-medium text-capy-text border border-transparent focus:ring-2 focus:ring-capy-primary/50" required />
+                                            <label className="block text-sm font-bold text-capy-light mb-2">時間</label>
+                                            <input type="time" value={time} onChange={e => setTime(e.target.value)} className="w-full bg-capy-bg rounded-xl px-4 py-3 outline-none font-medium text-capy-text border border-transparent focus:ring-2 focus:ring-capy-primary/50 text-base" required />
                                         </div>
                                     </div>
 
                                     <div className="flex gap-2">
-                                        <button type="button" onClick={() => setQuickTime('10m')} className="flex-1 py-2 rounded-xl text-xs font-bold bg-white text-capy-primary border border-capy-primary/30 active:bg-capy-header transition-colors">10分鐘後</button>
-                                        <button type="button" onClick={() => setQuickTime('1h')} className="flex-1 py-2 rounded-xl text-xs font-bold bg-white text-capy-primary border border-capy-primary/30 active:bg-capy-header transition-colors">1小時後</button>
-                                        <button type="button" onClick={() => setQuickTime('tmr')} className="flex-1 py-2 rounded-xl text-xs font-bold bg-white text-capy-primary border border-capy-primary/30 active:bg-capy-header transition-colors">明天</button>
+                                        <button type="button" onClick={() => setQuickTime('10m')} className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white text-capy-primary border border-capy-primary/30 active:bg-capy-header transition-colors">10分鐘後</button>
+                                        <button type="button" onClick={() => setQuickTime('1h')} className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white text-capy-primary border border-capy-primary/30 active:bg-capy-header transition-colors">1小時後</button>
+                                        <button type="button" onClick={() => setQuickTime('tmr')} className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white text-capy-primary border border-capy-primary/30 active:bg-capy-header transition-colors">明天</button>
                                     </div>
 
-                                    <button type="submit" className="w-full bg-capy-primary text-white font-bold text-lg py-3.5 rounded-xl mt-2 active:scale-95 transition-transform shadow-lg shadow-capy-primary/30 flex justify-center items-center gap-2">
+                                    <button type="submit" className="w-full bg-capy-primary text-white font-bold text-lg py-4 rounded-xl mt-2 active:scale-95 transition-transform shadow-lg shadow-capy-primary/30 flex justify-center items-center gap-2">
                                         讓水豚記住
                                     </button>
                                 </form>
@@ -531,7 +667,7 @@
                         </div>
                     )}
 
-                    {/* --- 全螢幕到期提醒 (精緻卡片版) --- */}
+                    {/* --- 全螢幕到期提醒 --- */}
                     {activeAlert && (
                         <div className="absolute inset-0 z-[7000] flex items-center justify-center p-6">
                             <div className="absolute inset-0 bg-capy-text/60 backdrop-blur-sm" onClick={() => setActiveAlert(null)}></div>
@@ -543,15 +679,15 @@
                                 </div>
                                 
                                 <div className="mt-2 z-10 w-full">
-                                    <span className="inline-block bg-capy-accent text-white font-bold px-4 py-1 rounded-full text-xs mb-4 shadow-sm tracking-wider">
+                                    <span className="inline-block bg-capy-accent text-white font-bold px-4 py-1.5 rounded-full text-sm mb-4 shadow-sm tracking-wider">
                                         叮咚！時間到了
                                     </span>
-                                    <h2 className="text-xl font-black text-capy-text mb-3 break-words leading-tight">{activeAlert.title}</h2>
-                                    <div className="flex justify-center items-center gap-4 text-capy-light font-bold text-sm mb-8 bg-gray-50 py-2 px-4 rounded-xl">
-                                        <span className="flex items-center gap-1"><Icons.Calendar /> {activeAlert.date}</span>
+                                    <h2 className="text-2xl font-black text-capy-text mb-3 break-words leading-tight">{activeAlert.title}</h2>
+                                    <div className="flex justify-center items-center gap-4 text-capy-light font-bold text-base mb-8 bg-gray-50 py-2 px-4 rounded-xl">
+                                        <span className="flex items-center gap-1"><Icons.Calendar /> {activeAlert.date.substring(5).replace('-', '/')}</span>
                                         <span className="flex items-center gap-1"><Icons.Bell /> {activeAlert.time}</span>
                                     </div>
-                                    <button onClick={() => { setActiveAlert(null); playTone('pop'); }} className="w-full bg-capy-primary text-white font-bold text-lg py-3.5 rounded-xl active:scale-95 transition-transform shadow-lg shadow-capy-primary/30">
+                                    <button onClick={() => { setActiveAlert(null); playTone('pop'); }} className="w-full bg-capy-primary text-white font-bold text-lg py-4 rounded-xl active:scale-95 transition-transform shadow-lg shadow-capy-primary/30">
                                         收到啦！
                                     </button>
                                 </div>
