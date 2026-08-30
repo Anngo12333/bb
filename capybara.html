@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>水豚與我 | 記憶大師版</title>
+    <title>水豚與我 | 離線保密版</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,14 +21,14 @@
                 extend: {
                     colors: {
                         capy: {
-                            bg: '#FDFAF5',
-                            header: '#FFF2E8',
+                            bg: '#FAF4EB',
+                            header: '#F5E6D3',
                             card: '#FFFFFF',
-                            primary: '#DCA57D',
-                            secondary: '#F2D3BC',
-                            text: '#594336',
-                            light: '#9E8576',
-                            accent: '#FF7B7B',
+                            primary: '#C48A54',
+                            secondary: '#E6C9A8',
+                            text: '#5C4033',
+                            light: '#8B6B56',
+                            accent: '#FF9B9B',
                             blue: '#85C1E9',
                             green: '#82E0AA'
                         }
@@ -36,42 +36,60 @@
                     animation: {
                         'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-                        'float': 'float 3s ease-in-out infinite',
+                        'float': 'float 4s ease-in-out infinite',
+                        'float-delayed': 'float 4s ease-in-out 2s infinite',
                         'bounce-slow': 'bounce 3s infinite',
                         'wiggle': 'wiggle 4s ease-in-out infinite',
-                        'sway': 'sway 2.5s ease-in-out infinite alternate',
+                        'sway': 'sway 3s ease-in-out infinite alternate',
+                        'ripple': 'ripple 2s linear infinite',
                     },
                     keyframes: {
                         slideUp: { '0%': { transform: 'translateY(100%)' }, '100%': { transform: 'translateY(0)' } },
                         popIn: { '0%': { transform: 'scale(0.8)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-8px)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' }, '50%': { transform: 'translateY(-15px) rotate(2deg)' } },
                         wiggle: { '0%, 100%': { transform: 'rotate(-2deg)' }, '50%': { transform: 'rotate(2deg)' } },
-                        sway: { '0%': { transform: 'rotate(-10deg) translateY(0px)' }, '100%': { transform: 'rotate(10deg) translateY(-4px)' } }
+                        sway: { '0%': { transform: 'rotate(-5deg) translateY(0px)' }, '100%': { transform: 'rotate(5deg) translateY(-3px)' } },
+                        ripple: { '0%': { boxShadow: '0 0 0 0 rgba(196, 138, 84, 0.3)' }, '100%': { boxShadow: '0 0 0 15px rgba(196, 138, 84, 0)' } }
                     }
                 }
             }
         }
     </script>
     <style>
-        html { font-size: 18px; } /* 放大整體字體與排版比例 */
-        body { background-color: #FDFAF5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; margin: 0; padding: 0; color: #594336; }
+        html { font-size: 16px; } 
+        body { background-color: #FAF4EB; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; margin: 0; padding: 0; color: #5C4033; }
         ::-webkit-scrollbar { display: none; } * { -ms-overflow-style: none; scrollbar-width: none; }
-        .game-canvas { touch-action: none; }
-        .cute-border { border: 6px dotted #F2D3BC; border-radius: 2.5rem; margin: 12px; height: calc(100% - 24px); overflow: hidden; background-color: white; box-shadow: inset 0 0 20px rgba(220, 165, 125, 0.1); }
         
-        /* 移植自 Reference 的美化進度條與徽章 */
-        .stat-bar-bg { flex: 1; height: 10px; background: #E5E8E8; border-radius: 5px; overflow: hidden; }
-        .stat-bar-fill { height: 100%; border-radius: 5px; transition: width 1s ease-out; }
-        .badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; }
-        .badge-item { display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.4; filter: grayscale(100%); transition: 0.5s; }
-        .badge-item.unlocked { opacity: 1; filter: grayscale(0%); transform: scale(1.05); }
-        .badge-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #FFF; border: 2px solid #EEE; position: relative;}
-        .badge-item.unlocked .badge-icon { border-color: #DCA57D; }
-        .badge-count { position: absolute; top: -5px; right: -5px; background: #FF7B7B; color: white; font-size: 10px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #FFF;}
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .pond-bg { background: linear-gradient(180deg, #FAF4EB 0%, #E3F2FD 100%); }
         
-        .radar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .radar-item { background: rgba(255,255,255,0.2); padding: 12px; border-radius: 12px; backdrop-filter: blur(5px); }
-        .radar-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; font-weight: 700; color: white; }
+        /* 蓮葉樣式 */
+        .lily-pad {
+            position: absolute;
+            background: #81C784;
+            border-radius: 50% 50% 50% 5% / 50% 50% 50% 50%;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1), 0 5px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .lily-pad:active { transform: scale(0.95); }
+        .lily-pad::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%);
+            border-radius: inherit; pointer-events: none;
+        }
+
+        /* 密碼鍵盤樣式 */
+        .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 260px; margin: 0 auto; }
+        .key-btn { width: 65px; height: 65px; border-radius: 50%; background: rgba(255,255,255,0.9); border: 1px solid #E6C9A8; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 600; color: #C48A54; cursor: pointer; transition: all 0.1s; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .key-btn:active { transform: scale(0.9); background: #F5E6D3; }
+        .pass-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #C48A54; transition: 0.2s; }
+        .pass-dot.filled { background: #C48A54; }
+
     </style>
 </head>
 <body>
@@ -80,7 +98,8 @@
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback } = React;
 
-        const playBeep = (type = 'success') => {
+        // --- 簡易音效 ---
+        const playTone = (type = 'pop') => {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContext) return;
@@ -90,208 +109,193 @@
                 osc.connect(gain);
                 gain.connect(ctx.destination);
 
-                if (type === 'success') {
-                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+                if (type === 'pop') {
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
                     gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-                    osc.start(); osc.stop(ctx.currentTime + 0.3);
-                } else {
-                    osc.frequency.setValueAtTime(150, ctx.currentTime);
-                    osc.frequency.setValueAtTime(100, ctx.currentTime + 0.2);
-                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                    osc.start(); osc.stop(ctx.currentTime + 0.1);
+                } else if (type === 'success') {
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
                     osc.start(); osc.stop(ctx.currentTime + 0.4);
+                } else if (type === 'error') {
+                    osc.frequency.setValueAtTime(200, ctx.currentTime);
+                    osc.frequency.setValueAtTime(150, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                    osc.start(); osc.stop(ctx.currentTime + 0.3);
                 }
             } catch (e) {}
         };
 
-        const USER_IMG_URL = 'https://images.unsplash.com/photo-1598912948600-09e455bc8f55?auto=format&fit=crop&w=400&q=80';
-
+        // ---  SVG 圖示 ---
         const Icons = {
-            Home: ({ active }) => <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
-            Gamepad: ({ active }) => <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4"></path><path d="M8 10v4"></path><path d="M15 13h.01"></path><path d="M18 11h.01"></path></svg>,
-            Book: ({ active }) => <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>,
-            Star: ({ active }) => <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>,
+            Home: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>,
+            Book: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>,
+            Lock: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
             Plus: () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
             Close: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
-            Bell: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>,
             Trash: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
-            Download: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Settings: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+            Bell: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>,
+            Calendar: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
         };
 
-        const StackedCapybarasIcon = ({ className = "w-32 h-32", animated = false }) => (
-            <div className={`${className} ${animated ? 'animate-float' : ''}`} dangerouslySetInnerHTML={{ __html: `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 250">
-                <g stroke="#000000" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
-                    <path d="M 50 235 C 50 255, 75 255, 75 235" fill="#D48B6A" />
-                    <path d="M 150 235 C 150 255, 125 255, 125 235" fill="#D48B6A" />
-                    <path d="M 100 115 C 170 115, 195 180, 190 230 C 185 245, 15 245, 10 230 C 5 180, 30 115, 100 115 Z" fill="#D48B6A" />
-                    <path d="M 70 125 C 60 100, 85 110, 90 120" fill="#D48B6A" />
-                    <path d="M 130 125 C 140 100, 115 110, 110 120" fill="#D48B6A" />
-                    <circle cx="55" cy="165" r="9" fill="#000" stroke="none" />
-                    <circle cx="145" cy="165" r="9" fill="#000" stroke="none" />
-                    <path d="M 90 175 C 90 165, 110 165, 110 175 C 110 185, 90 185, 90 175 Z" fill="#000" stroke="none"/>
-                    <path d="M 100 185 L 100 200" fill="none" />
-                    <path d="M 100 200 C 115 215, 130 200, 125 195" fill="none" />
-                    <path d="M 100 200 C 85 215, 70 200, 75 195" fill="none" />
-                    <path d="M 100 55 C 145 55, 160 95, 155 125 C 150 135, 50 135, 45 125 C 40 95, 55 55, 100 55 Z" fill="#D48B6A" />
-                    <path d="M 75 60 C 65 45, 90 50, 90 60" fill="#D48B6A" />
-                    <path d="M 125 60 C 135 45, 110 50, 110 60" fill="#D48B6A" />
-                    <circle cx="70" cy="85" r="6" fill="#000" stroke="none" />
-                    <circle cx="130" cy="85" r="6" fill="#000" stroke="none" />
-                    <path d="M 94 92 C 94 88, 106 88, 106 92 C 106 96, 94 96, 94 92 Z" fill="#000" stroke="none"/>
-                    <path d="M 100 96 L 100 105" fill="none" />
-                    <path d="M 100 105 C 110 115, 120 105, 115 102" fill="none" />
-                    <path d="M 100 105 C 90 115, 80 105, 85 102" fill="none" />
-                    <path d="M 100 10 C 130 10, 140 40, 135 60 C 130 70, 70 70, 65 60 C 60 40, 70 10, 100 10 Z" fill="#D48B6A" />
-                    <path d="M 80 15 C 75 0, 95 10, 95 15" fill="#D48B6A" />
-                    <path d="M 120 15 C 125 0, 105 10, 105 15" fill="#D48B6A" />
-                    <circle cx="80" cy="35" r="5" fill="#000" stroke="none" />
-                    <circle cx="120" cy="35" r="5" fill="#000" stroke="none" />
-                    <path d="M 96 40 C 96 37, 104 37, 104 40 C 104 43, 96 43, 96 40 Z" fill="#000" stroke="none"/>
-                    <path d="M 100 43 L 100 50" fill="none" />
-                    <path d="M 100 50 C 108 58, 115 50, 112 48" fill="none" />
-                    <path d="M 100 50 C 92 58, 85 50, 88 48" fill="none" />
-                </g>
-            </svg>`}} />
+        // --- 純粹的 SVG 水豚 ---
+        const CuteCapyIcon = ({ className = "w-32 h-32" }) => (
+            <svg viewBox="0 0 120 120" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="25" y="40" width="70" height="60" rx="30" fill="#C48A54"/>
+                <path d="M30 50 C20 40, 25 30, 40 35" fill="#8B6B56" stroke="#5C4033" strokeWidth="2"/>
+                <path d="M90 50 C100 40, 95 30, 80 35" fill="#8B6B56" stroke="#5C4033" strokeWidth="2"/>
+                <ellipse cx="35" cy="70" rx="6" ry="4" fill="#FFB6C1" opacity="0.8"/>
+                <ellipse cx="85" cy="70" rx="6" ry="4" fill="#FFB6C1" opacity="0.8"/>
+                <circle cx="45" cy="60" r="4" fill="#333333"/>
+                <circle cx="75" cy="60" r="4" fill="#333333"/>
+                <rect x="50" y="70" width="20" height="15" rx="7.5" fill="#E6C9A8"/>
+                <circle cx="56" cy="75" r="1.5" fill="#5C4033"/>
+                <circle cx="64" cy="75" r="1.5" fill="#5C4033"/>
+                <path d="M55 80 Q60 84 65 80" stroke="#5C4033" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                {/* 橘子頂在頭上 */}
+                <circle cx="60" cy="28" r="9" fill="#F9A826"/>
+                <path d="M60 19 Q63 15 66 18" stroke="#2E7D32" strokeWidth="2" strokeLinecap="round" fill="none"/>
+            </svg>
         );
 
-        let canvasCapybaraImg = null;
-        if (typeof Blob !== 'undefined') {
-            const blob = new Blob([`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 250"><g stroke="#000000" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"><path d="M 50 235 C 50 255, 75 255, 75 235" fill="#D48B6A" /><path d="M 150 235 C 150 255, 125 255, 125 235" fill="#D48B6A" /><path d="M 100 115 C 170 115, 195 180, 190 230 C 185 245, 15 245, 10 230 C 5 180, 30 115, 100 115 Z" fill="#D48B6A" /><path d="M 70 125 C 60 100, 85 110, 90 120" fill="#D48B6A" /><path d="M 130 125 C 140 100, 115 110, 110 120" fill="#D48B6A" /><circle cx="55" cy="165" r="9" fill="#000" stroke="none" /><circle cx="145" cy="165" r="9" fill="#000" stroke="none" /><path d="M 90 175 C 90 165, 110 165, 110 175 C 110 185, 90 185, 90 175 Z" fill="#000" stroke="none"/><path d="M 100 185 L 100 200" fill="none" /><path d="M 100 200 C 115 215, 130 200, 125 195" fill="none" /><path d="M 100 200 C 85 215, 70 200, 75 195" fill="none" /><path d="M 100 55 C 145 55, 160 95, 155 125 C 150 135, 50 135, 45 125 C 40 95, 55 55, 100 55 Z" fill="#D48B6A" /><path d="M 75 60 C 65 45, 90 50, 90 60" fill="#D48B6A" /><path d="M 125 60 C 135 45, 110 50, 110 60" fill="#D48B6A" /><circle cx="70" cy="85" r="6" fill="#000" stroke="none" /><circle cx="130" cy="85" r="6" fill="#000" stroke="none" /><path d="M 94 92 C 94 88, 106 88, 106 92 C 106 96, 94 96, 94 92 Z" fill="#000" stroke="none"/><path d="M 100 96 L 100 105" fill="none" />
-                    <path d="M 100 105 C 110 115, 120 105, 115 102" fill="none" /><path d="M 100 105 C 90 115, 80 105, 85 102" fill="none" /><path d="M 100 10 C 130 10, 140 40, 135 60 C 130 70, 70 70, 65 60 C 60 40, 70 10, 100 10 Z" fill="#D48B6A" /><path d="M 80 15 C 75 0, 95 10, 95 15" fill="#D48B6A" /><path d="M 120 15 C 125 0, 105 10, 105 15" fill="#D48B6A" /><circle cx="80" cy="35" r="5" fill="#000" stroke="none" /><circle cx="120" cy="35" r="5" fill="#000" stroke="none" /><path d="M 96 40 C 96 37, 104 37, 104 40 C 104 43, 96 43, 96 40 Z" fill="#000" stroke="none"/><path d="M 100 43 L 100 50" fill="none" /><path d="M 100 50 C 108 58, 115 50, 112 48" fill="none" /><path d="M 100 50 C 92 58, 85 50, 88 48" fill="none" /></g></svg>`], {type: 'image/svg+xml;charset=utf-8'});
-            canvasCapybaraImg = new Image();
-            canvasCapybaraImg.src = URL.createObjectURL(blob);
-        }
+        // --- 密碼鎖組件 (100% 離線防護) ---
+        const LockScreen = ({ onUnlock }) => {
+            const [input, setInput] = useState('');
+            const [error, setError] = useState(false);
+            const CORRECT_PIN = 'caca'; // Default password "caca"
 
-        const MemoryTaskGame = ({ tasks }) => {
-            const [cards, setCards] = useState([]);
-            const [flipped, setFlipped] = useState([]);
-            const [solved, setSolved] = useState([]);
-            const [comboMsg, setComboMsg] = useState('');
-
-            const emojis = ['💼', '🏠', '💡', '🏃', '🍎', '🦦'];
-            
-            useEffect(() => {
-                const initialCards = [...emojis, ...emojis]
-                    .sort(() => Math.random() - 0.5)
-                    .map((icon, id) => ({ id, icon }));
-                setCards(initialCards);
-                setFlipped([]);
-                setSolved([]);
-            }, []);
-
-            const handleFlip = (index) => {
-                if (flipped.length === 2 || flipped.includes(index) || solved.includes(index)) return;
-                const newFlipped = [...flipped, index];
-                setFlipped(newFlipped);
-
-                if (newFlipped.length === 2) {
-                    const match = cards[newFlipped[0]].icon === cards[newFlipped[1]].icon;
-                    if (match) {
-                        setSolved([...solved, ...newFlipped]);
-                        
-                        // 互動式提醒：從未完成的任務中隨機挑選提示
-                        const activeTasks = tasks.filter(t => !t.isTriggered);
-                        if (activeTasks.length > 0) {
-                            const randomTask = activeTasks[Math.floor(Math.random() * activeTasks.length)];
-                            setComboMsg(`✨ 溫馨提醒: ${randomTask.title}`);
+            const handlePress = (val) => {
+                if (val === 'del') {
+                    setInput(prev => prev.slice(0, -1));
+                    setError(false);
+                    return;
+                }
+                
+                if (input.length < 4) {
+                    playTone('pop');
+                    const newVal = input + val;
+                    setInput(newVal);
+                    
+                    if (newVal.length === 4) {
+                        if (newVal.toLowerCase() === CORRECT_PIN.toLowerCase()) {
+                            playTone('success');
+                            setTimeout(onUnlock, 300);
                         } else {
-                            setComboMsg(`✨ 太棒了！目前沒有未完成的任務！`);
+                            playTone('error');
+                            setError(true);
+                            setTimeout(() => {
+                                setInput('');
+                                setError(false);
+                            }, 500);
                         }
-                        
-                        // 播放音效
-                        try { playBeep('success'); } catch(e){}
-                        setTimeout(() => setComboMsg(''), 3000);
-                    } else {
-                        try { playBeep('error'); } catch(e){}
                     }
-                    setTimeout(() => setFlipped([]), 800);
                 }
             };
 
             return (
-                <div className="flex-1 w-full h-full relative flex flex-col items-center py-8 px-6 bg-gradient-to-b from-[#FFF2E8] to-[#FDFAF5] rounded-t-[2.5rem] shadow-inner border-t border-orange-100 overflow-y-auto">
-                    <div className="text-center mb-6">
-                        <h2 className="text-3xl font-black text-capy-text">任務記憶大師</h2>
-                        <p className="text-base font-bold text-capy-light mt-2">配對圖案，解鎖你的日常提醒！</p>
+                <div className="fixed inset-0 bg-capy-header flex flex-col items-center justify-center z-[9999] transition-opacity duration-300">
+                    <div className="mb-8 animate-float">
+                        <CuteCapyIcon className="w-32 h-32" />
                     </div>
+                    <h2 className="text-xl font-bold text-capy-text mb-8">請輸入密碼解鎖</h2>
                     
-                    {comboMsg && (
-                        <div className="absolute top-28 bg-white/95 backdrop-blur-sm px-6 py-5 rounded-2xl shadow-xl border-2 border-orange-200 text-orange-600 font-bold z-10 animate-pop-in text-center w-[85%] text-lg">
-                            {comboMsg}
-                        </div>
-                    )}
+                    <div className={`flex gap-4 mb-8 ${error ? 'animate-wiggle' : ''}`}>
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className={`pass-dot ${i < input.length ? 'filled' : ''} ${error ? 'border-red-500' : ''}`}></div>
+                        ))}
+                    </div>
 
-                    <div className="grid grid-cols-3 gap-5 w-full max-w-[320px]">
-                        {cards.map((card, i) => {
-                            const isFlipped = flipped.includes(i) || solved.includes(i);
-                            return (
-                                <div 
-                                    key={card.id} 
-                                    onClick={() => handleFlip(i)}
-                                    className={`h-28 rounded-2xl cursor-pointer transition-all duration-300 shadow-sm flex items-center justify-center text-5xl ${isFlipped ? 'bg-white border-2 border-orange-200 scale-100' : 'bg-capy-primary border-b-4 border-[#B8815A] active:scale-95'}`}
-                                >
-                                    {isFlipped ? card.icon : '❓'}
-                                </div>
-                            );
-                        })}
+                    <div className="keypad-grid">
+                        {['a','b','c','d','e','f','g','h','i'].map((char) => (
+                            <button key={char} onClick={() => handlePress(char)} className="key-btn">{char.toUpperCase()}</button>
+                        ))}
+                        <div></div>
+                        <button onClick={() => handlePress('0')} className="key-btn invisible">0</button>
+                        <button onClick={() => handlePress('del')} className="key-btn bg-transparent border-none shadow-none text-2xl">⌫</button>
                     </div>
-                    
-                    {solved.length === cards.length && cards.length > 0 && (
-                        <div className="mt-10 animate-bounce-slow">
-                            <button onClick={() => {
-                                setCards([...emojis, ...emojis].sort(() => Math.random() - 0.5).map((icon, id) => ({ id, icon })));
-                                setFlipped([]); setSolved([]);
-                            }} className="bg-orange-500 text-white font-black py-4 px-10 rounded-full shadow-lg active:scale-95 transition-transform text-lg">再來一局</button>
-                        </div>
-                    )}
                 </div>
             );
         };
 
         // --- 主應用程式 ---
         const App = () => {
+            const [isLocked, setIsLocked] = useState(true);
             const [activeTab, setActiveTab] = useState('home');
-            
-            // 任務資料 (提醒)
-            const [tasks, setTasks] = useState(() => { try { return JSON.parse(localStorage.getItem('capy_tasks_v3')) || []; } catch(e) { return []; } });
-
-            // 日記資料 (結合圖片)
-            const [diary, setDiary] = useState(() => { try { return JSON.parse(localStorage.getItem('capy_diary_v1')) || []; } catch(e) { return []; } });
-
+            const [tasks, setTasks] = useState(() => {
+                try { return JSON.parse(localStorage.getItem('capy_offline_tasks')) || []; } catch(e) { return []; }
+            });
             const [isSheetOpen, setIsSheetOpen] = useState(false);
-            const [sheetMode, setSheetMode] = useState('menu'); // 'menu', 'reminder', 'diary'
-            const [activeAlert, setActiveAlert] = useState(null);
             const [toastMsg, setToastMsg] = useState('');
             
-            // Task form state
+            // 提醒表單
             const [title, setTitle] = useState('');
             const [date, setDate] = useState('');
             const [time, setTime] = useState('');
-            const [showSuggestions, setShowSuggestions] = useState(false);
-            const [selectedCategory, setSelectedCategory] = useState(null);
+            const [category, setCategory] = useState('');
+            const [activeAlert, setActiveAlert] = useState(null);
 
-            // 提取歷史獨立標題用於 Autocomplete
-            const pastTitles = [...new Set(tasks.map(t => t.title))];
+            const categories = [
+                { id: 'work', icon: '💼', name: '工作', color: 'bg-blue-100 text-blue-600 border-blue-200' },
+                { id: 'family', icon: '🏠', name: '家庭', color: 'bg-orange-100 text-orange-600 border-orange-200' },
+                { id: 'idea', icon: '💡', name: '靈感', color: 'bg-purple-100 text-purple-600 border-purple-200' },
+                { id: 'health', icon: '🏃', name: '健康', color: 'bg-green-100 text-green-600 border-green-200' },
+            ];
 
-            // 智能靈感庫大數據
-            const inspirationData = {
-                work: { icon: '💼', theme: 'blue', label: '工作事項', items: ['回覆重要郵件', '準備會議資料', '提交工作報告', '整理桌面與檔案', '規劃下週行程', '追蹤專案進度', '聯繫重要客戶', '發送電子報'] },
-                family: { icon: '🏠', theme: 'orange', label: '家庭生活', items: ['採買生鮮雜貨', '繳納水電帳單', '洗衣服曬衣服', '居家環境大掃除', '準備家庭晚餐', '陪伴家人孩子', '預約定期維修', '倒垃圾回收'] },
-                idea: { icon: '💡', theme: 'purple', label: '靈感學習', items: ['閱讀專業書籍', '紀錄突發靈感', '學習線上課程', '聽Podcast進修', '覆盤今日反思', '規劃長期目標', '整理筆記大綱', '構思新企劃'] },
-                health: { icon: '🏃', theme: 'green', label: '身心健康', items: ['喝一大杯溫水', '運動拉筋30分鐘', '吃保健營養品', '預約定期看診', '閉眼冥想5分鐘', '提早準備睡覺', '起身走動伸展', '眼睛放鬆休息'] }
+            // 存儲機制
+            useEffect(() => {
+                localStorage.setItem('capy_offline_tasks', JSON.stringify(tasks));
+            }, [tasks]);
+
+            // 自動設定新增行程的時間為當前時間
+            useEffect(() => {
+                if (isSheetOpen) {
+                    const now = new Date();
+                    const localDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                    setDate(localDate);
+                    setTime(now.toTimeString().substring(0, 5));
+                }
+            }, [isSheetOpen]);
+
+            // Toast
+            const showT = (msg) => {
+                setToastMsg(msg);
+                setTimeout(() => setToastMsg(''), 3000);
             };
 
-            const themeClasses = {
-                blue: { btn: 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100', activeCard: 'bg-blue-50 border-blue-300 text-blue-700' },
-                orange: { btn: 'bg-orange-50 border-orange-200 text-orange-600 hover:bg-orange-100', activeCard: 'bg-orange-50 border-orange-300 text-orange-700' },
-                purple: { btn: 'bg-purple-50 border-purple-200 text-purple-600 hover:bg-purple-100', activeCard: 'bg-purple-50 border-purple-300 text-purple-700' },
-                green: { btn: 'bg-green-50 border-green-200 text-green-600 hover:bg-green-100', activeCard: 'bg-green-50 border-green-300 text-green-700' }
-            };
+            // 檢查到期
+            useEffect(() => {
+                if (isLocked) return;
+                const timer = setInterval(() => {
+                    const now = new Date();
+                    const currentLocalTime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+                    const currentDateStr = currentLocalTime.toISOString().split('T')[0];
+                    const currentTimeStr = now.toTimeString().substring(0, 5);
 
-            // 快捷時間設定器
+                    const dueTask = tasks.find(t => 
+                        t.date === currentDateStr && 
+                        t.time === currentTimeStr && 
+                        !t.isTriggered
+                    );
+
+                    if (dueTask) {
+                        setTasks(prev => prev.map(t => 
+                            t.id === dueTask.id ? { ...t, isTriggered: true } : t
+                        ));
+                        setActiveAlert(dueTask);
+                        playTone('success');
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    }
+                }, 1000);
+                return () => clearInterval(timer);
+            }, [tasks, isLocked]);
+
             const setQuickTime = (type) => {
                 const now = new Date();
                 if (type === '10m') now.setMinutes(now.getMinutes() + 10);
@@ -301,458 +305,255 @@
                 const localDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
                 setDate(localDate);
                 setTime(now.toTimeString().substring(0, 5));
+                playTone('pop');
             };
 
-            // Diary form state
-            const [diaryText, setDiaryText] = useState('');
-            const [diaryImg, setDiaryImg] = useState('');
-            const [activeTags, setActiveTags] = useState([]);
-            
-            // Stats state
-            const [stats, setStats] = useState({ work: 0, family: 0, idea: 0, health: 0 });
-
-            // Toast helper
-            const showT = (msg) => { setToastMsg(msg); setTimeout(() => setToastMsg(''), 3000); };
-
-            // Save Tasks safely
-            useEffect(() => { try { localStorage.setItem('capy_tasks_v3', JSON.stringify(tasks)); } catch (e) {} }, [tasks]);
-
-            // Save Diary safely with Quota Handling
-            useEffect(() => {
-                try {
-                    localStorage.setItem('capy_diary_v1', JSON.stringify(diary));
-                } catch (e) {
-                    if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                        // 記憶體防爆：刪除舊的 50% 紀錄
-                        const safeDiary = diary.slice(0, Math.floor(diary.length / 2));
-                        setDiary(safeDiary);
-                        localStorage.setItem('capy_diary_v1', JSON.stringify(safeDiary));
-                        showT('⚠️ 儲存空間已滿，已自動清理舊紀錄！');
-                    }
-                }
-            }, [diary]);
-
-            useEffect(() => { if ("Notification" in window && Notification.permission !== "granted") Notification.requestPermission(); }, []);
-
-            useEffect(() => {
-                if (isSheetOpen && sheetMode === 'reminder') {
-                    const now = new Date();
-                    const localDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-                    setDate(localDate); setTime(now.toTimeString().substring(0, 5));
-                }
-            }, [isSheetOpen, sheetMode]);
-
-            useEffect(() => {
-                const timer = setInterval(() => {
-                    const now = new Date();
-                    const currentLocalTime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
-                    const currentDateStr = currentLocalTime.toISOString().split('T')[0];
-                    const currentTimeStr = now.toTimeString().substring(0, 5);
-
-                    const dueTask = tasks.find(t => t.date === currentDateStr && t.time === currentTimeStr && !t.isTriggered);
-
-                    if (dueTask) {
-                        setTasks(prev => prev.map(t => t.id === dueTask.id ? { ...t, isTriggered: true } : t));
-                        setActiveAlert(dueTask); playBeep('success');
-                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                        if (document.hidden && "Notification" in window && Notification.permission === "granted") {
-                            new Notification("水豚與我 - 提醒您 🔔", { body: `時間到了：${dueTask.title}` });
-                        }
-                    }
-                }, 1000);
-                return () => clearInterval(timer);
-            }, [tasks]);
-
-            // --- Handlers ---
             const handleAddTask = (e) => {
-                e.preventDefault(); if (!title.trim() || !date || !time) return;
-                const newTask = { id: Date.now().toString(), title: title.trim(), date, time, isTriggered: false };
+                e.preventDefault();
+                if (!title.trim() || !date || !time) return;
+                const newTask = {
+                    id: Date.now().toString(),
+                    title: title.trim(),
+                    date,
+                    time,
+                    category: category || 'idea', // 預設靈感
+                    isTriggered: false
+                };
                 setTasks(prev => [...prev, newTask].sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`)));
-                setTitle(''); setIsSheetOpen(false); setActiveTab('home'); showT('✨ 提醒事項已成功新增！');
+                setTitle(''); setCategory(''); setIsSheetOpen(false);
+                showT('✨ 提醒已儲存 (100% 離線)');
+                playTone('success');
             };
 
-            const handleDeleteTask = (id) => { setTasks(prev => prev.filter(t => t.id !== id)); };
+            // --- AI 水花池塘渲染 (視覺化提醒) ---
+            const renderLilyPads = () => {
+                const activeTasks = tasks.filter(t => !t.isTriggered).slice(0, 8); // 最多顯示 8 個
+                if (activeTasks.length === 0) return null;
 
-            const handleImageUpload = (e) => {
-                const file = e.target.files[0]; if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-                        const MAX_WIDTH = 500; let ratio = MAX_WIDTH / img.width; if (ratio > 1) ratio = 1;
-                        canvas.width = img.width * ratio; canvas.height = img.height * ratio;
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        setDiaryImg(canvas.toDataURL('image/jpeg', 0.7)); showT('📸 相片壓縮處理成功！');
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            };
+                return activeTasks.map((task, index) => {
+                    // 簡單的隨機散佈邏輯
+                    const top = 15 + Math.abs(Math.sin(index * 123) * 60) + '%';
+                    const left = 10 + Math.abs(Math.cos(index * 321) * 70) + '%';
+                    const catObj = categories.find(c => c.id === task.category) || categories[2];
+                    const delay = (index * 0.5) + 's';
+                    
+                    // 根據文字長度決定大小，將整體尺寸放大以增添可愛感與可讀性
+                    const size = Math.max(100, Math.min(160, 80 + task.title.length * 10));
 
-            const toggleTag = (tag) => {
-                if(activeTags.includes(tag)) setActiveTags(activeTags.filter(t => t !== tag));
-                else setActiveTags([...activeTags, tag]);
-            };
-
-            const handleAddDiary = () => {
-                if (!diaryText.trim() && !diaryImg) return showT('請輸入文字或上傳照片！');
-                
-                // AI Local Reminder Extraction
-                let aiSuggestion = null;
-                const checkStr = diaryText.toLowerCase();
-                if(checkStr.match(/明天|下週|下午/)) {
-                    if(checkStr.includes('開會') || checkStr.includes('報告')) aiSuggestion = '準備會議資料';
-                    else if(checkStr.includes('買')) aiSuggestion = '記得採買物品';
-                    else if(checkStr.includes('醫生') || checkStr.includes('看診')) aiSuggestion = '回診時間';
-                    else aiSuggestion = '回顧日記重點';
-                }
-
-                const newEntry = { id: Date.now().toString(), time: new Date().getTime(), text: diaryText, tags: activeTags, img: diaryImg };
-                setDiary(prev => [newEntry, ...prev]);
-                
-                if (aiSuggestion) {
-                    const tmr = new Date(new Date().getTime() + 86400000);
-                    const localDate = new Date(tmr.getTime() - (tmr.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-                    setTasks(prev => [...prev, { id: Date.now().toString()+'_ai', title: '🤖 AI建議: '+aiSuggestion, date: localDate, time: '09:00', isTriggered: false }].sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`)));
-                    showT(`📝 紀錄成功！AI 已為您加入明日提醒：${aiSuggestion}`);
-                } else {
-                    showT('📝 日記大數據儲存成功！');
-                }
-
-                setDiaryText(''); setDiaryImg(''); setActiveTags([]); setIsSheetOpen(false); setActiveTab('diary');
-            };
-
-            const deleteDiary = (id) => { setDiary(prev => prev.filter(d => d.id !== id)); };
-
-            const handleExport = () => {
-                const backupData = { tasks, diary };
-                const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = `capybara_pro_backup_${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a); a.click(); document.body.removeChild(a); showT("✅ 備份檔已成功下載！");
-            };
-
-            const handleImport = (e) => {
-                const file = e.target.files[0]; if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const data = JSON.parse(event.target.result);
-                        if (data.tasks !== undefined) setTasks(data.tasks);
-                        if (data.diary !== undefined) setDiary(data.diary);
-                        showT("✅ 資料還原成功！");
-                    } catch (err) { showT("無效的備份檔案格式"); }
-                };
-                reader.readAsText(file); e.target.value = null;
-            };
-
-            const scanStats = () => {
-                let w = 0, f = 0, i = 0, h = 0;
-                diary.forEach(d => {
-                    const txt = d.text.toLowerCase() + d.tags.join(' ');
-                    if (txt.includes('工作') || txt.includes('開會') || txt.includes('報告') || txt.includes('專案')) w += 15;
-                    if (txt.includes('家庭') || txt.includes('家事') || txt.includes('陪伴') || txt.includes('採買')) f += 15;
-                    if (txt.includes('靈感') || txt.includes('設計') || txt.includes('寫作') || txt.includes('筆記')) i += 15;
-                    if (txt.includes('健康') || txt.includes('運動') || txt.includes('睡眠') || txt.includes('水')) h += 15;
+                    return (
+                        <div 
+                            key={task.id}
+                            className={`lily-pad ${index % 2 === 0 ? 'animate-float' : 'animate-float-delayed'} absolute shadow-lg`}
+                            style={{ 
+                                top, left, 
+                                width: `${size}px`, height: `${size}px`,
+                                animationDelay: delay
+                            }}
+                            onClick={() => {
+                                setActiveAlert(task);
+                                playTone('pop');
+                            }}
+                        >
+                            <div className="text-center p-3 text-white drop-shadow-md flex flex-col items-center justify-center w-full h-full">
+                                <span className="text-4xl mb-2 drop-shadow-lg">{catObj.icon}</span>
+                                <span className="text-[13px] font-bold leading-snug line-clamp-2 w-full px-2 break-words">
+                                    {task.title}
+                                </span>
+                            </div>
+                        </div>
+                    );
                 });
-                setStats({ work: Math.min(w, 100), family: Math.min(f, 100), idea: Math.min(i, 100), health: Math.min(h, 100) });
-                showT("🔍 歷史大數據分析完成！解鎖專屬圖鑑徽章！");
             };
+
+            if (isLocked) {
+                return <LockScreen onUnlock={() => setIsLocked(false)} />;
+            }
 
             return (
                 <div className="relative w-full h-screen bg-capy-bg text-capy-text overflow-hidden flex flex-col font-sans">
-                    <div className={`fixed top-10 left-1/2 transform -translate-x-1/2 bg-[#2C3E50]/95 text-white px-6 py-3 rounded-full z-[6000] shadow-xl text-sm font-bold flex items-center gap-2 transition-all duration-400 ease-out ${toastMsg ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-12 pointer-events-none'}`}>
-                        💡 {toastMsg}
+                    
+                    {/* Toast */}
+                    <div className={`fixed top-10 left-1/2 transform -translate-x-1/2 bg-capy-text text-white px-5 py-2.5 rounded-full z-[6000] shadow-xl text-sm font-bold flex items-center gap-2 transition-all duration-400 ease-out ${toastMsg ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-12 pointer-events-none'}`}>
+                        {toastMsg}
                     </div>
 
-                    <main className="flex-1 overflow-hidden flex flex-col pb-[85px]">
-                        
-                        {/* --- Tab: Home (Reminders) --- */}
+                    <main className="flex-1 overflow-hidden flex flex-col pb-20">
+                        {/* --- 首頁：水花池塘 --- */}
                         {activeTab === 'home' && (
-                            <div className="h-full flex flex-col animate-pop-in cute-border relative">
-                                <header className="pt-8 pb-6 px-4 bg-capy-header rounded-b-[2.5rem] flex flex-col items-center relative overflow-hidden">
-                                    <div className="w-full flex justify-between items-start mb-2 relative z-10 px-2">
-                                        <div><h1 className="text-2xl font-black text-capy-text tracking-wide">水豚與我</h1><p className="text-capy-primary text-xs font-bold mt-1">你的貼身療癒小助手 ✨</p></div>
-                                        <button onClick={() => setActiveAlert({title: '測試提醒', time: '現在'})} className="bg-white/80 hover:bg-white text-capy-primary border border-capy-primary/20 p-2 rounded-full backdrop-blur-sm text-xs font-bold px-3 transition-colors shadow-sm">測試</button>
+                            <div className="h-full flex flex-col animate-pop-in relative pond-bg">
+                                <header className="pt-10 pb-4 px-6 flex justify-between items-center z-10 relative">
+                                    <div>
+                                        <h1 className="text-2xl font-black text-capy-text tracking-wide drop-shadow-sm">水豚與我</h1>
+                                        <p className="text-capy-primary text-xs font-bold mt-1 bg-white/50 inline-block px-2 py-0.5 rounded-full">100% 離線保密</p>
                                     </div>
-                                    <div className="relative z-10 mt-4 flex flex-col items-center">
-                                        <div className="bg-white px-4 py-2 rounded-2xl shadow-sm mb-3 relative animate-bounce-slow border border-gray-100 z-20">
-                                            <p className="text-capy-text font-bold text-sm">期待著你回來喔 ✨</p>
-                                            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[10px] border-transparent border-t-white"></div>
-                                        </div>
-                                        <div className="relative flex items-center justify-center">
-                                            <div className="absolute -left-12 -top-2 text-3xl animate-sway">🍰</div><div className="absolute -right-12 top-0 text-3xl animate-sway" style={{animationDelay: '0.5s'}}>🧁</div><div className="absolute -left-10 bottom-2 text-3xl animate-sway" style={{animationDelay: '1s'}}>🎂</div><div className="absolute -right-10 bottom-0 text-3xl animate-sway" style={{animationDelay: '1.5s'}}>🍮</div>
-                                            <div className="bg-white/60 p-2 rounded-[2rem] shadow-sm animate-wiggle"><StackedCapybarasIcon className="w-32 h-40" /></div>
-                                        </div>
-                                    </div>
+                                    <button onClick={() => setIsLocked(true)} className="p-2 bg-white/60 rounded-full text-capy-primary shadow-sm hover:bg-white transition-colors">
+                                        <Icons.Lock />
+                                    </button>
                                 </header>
-                                <div className="flex-1 overflow-y-auto px-6 pt-6 pb-6 bg-white">
-                                    {tasks.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center h-40 opacity-60"><p className="text-lg font-bold text-capy-light">今天還沒有行程喔</p></div>
-                                    ) : (
-                                        <div className="space-y-4">
-                                            {tasks.map(task => (
-                                                <div key={task.id} className={`bg-capy-bg p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col gap-3 ${task.isTriggered ? 'opacity-50 grayscale-[0.3]' : ''}`}>
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${task.isTriggered ? 'bg-gray-200 text-gray-400' : 'bg-white text-capy-primary shadow-sm'}`}><Icons.Bell /></div>
-                                                            <div><h3 className={`font-bold text-lg ${task.isTriggered ? 'line-through text-gray-400' : 'text-capy-text'}`}>{task.title}</h3><div className="text-sm font-medium text-capy-light mt-1">{task.date.replace(/-/g, '/')} • {task.time}</div></div>
-                                                        </div>
-                                                        <button onClick={() => handleDeleteTask(task.id)} className="p-3 text-gray-300 hover:text-red-400 bg-white rounded-full"><Icons.Trash /></button>
-                                                    </div>
-                                                </div>
-                                            ))}
+
+                                {/* 互動池塘區 */}
+                                <div className="flex-1 relative overflow-hidden mt-4">
+                                    {/* 裝飾波紋 */}
+                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full animate-ripple z-0"></div>
+                                    
+                                    {/* 蓮葉提醒 */}
+                                    {renderLilyPads()}
+
+                                    {/* 中央水豚 */}
+                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                                        <CuteCapyIcon className="w-36 h-36 drop-shadow-xl animate-sway" />
+                                    </div>
+
+                                    {tasks.filter(t => !t.isTriggered).length === 0 && (
+                                        <div className="absolute bottom-20 w-full text-center text-capy-light/70 font-bold text-sm z-0">
+                                            水面平靜...點擊下方「+」新增事項
                                         </div>
                                     )}
                                 </div>
                             </div>
                         )}
 
-                        {/* --- Tab: Diary --- */}
-                        {activeTab === 'diary' && (
-                            <div className="h-full flex flex-col animate-pop-in bg-white px-6 pt-10 pb-6 overflow-y-auto">
-                                <div className="flex justify-between items-center mb-6">
-                                    <div><h1 className="text-2xl font-black text-capy-text">水豚日記</h1><p className="text-capy-light text-sm font-medium">記錄與 AI 自動分析</p></div>
-                                    <div className="flex gap-2">
-                                        <button onClick={handleExport} className="p-2 bg-capy-bg rounded-xl text-capy-primary border border-capy-secondary shadow-sm"><Icons.Download /></button>
-                                        <label className="p-2 bg-capy-bg rounded-xl text-capy-primary border border-capy-secondary shadow-sm cursor-pointer">
-                                            <input type="file" accept=".json" className="hidden" onChange={handleImport} /> 📤
-                                        </label>
-                                    </div>
-                                </div>
-                                <div className="space-y-6">
-                                    {diary.length === 0 && <div className="text-center text-capy-light mt-10">點擊下方 ➕ 開始記錄生活！</div>}
-                                    {diary.map(d => (
-                                        <div key={d.id} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-[0_4px_15px_rgba(0,0,0,0.03)]">
-                                            <div className="flex justify-between mb-3">
-                                                <div className="text-xs text-capy-light font-bold">{new Date(d.time).toLocaleString()}</div>
-                                                <button onClick={() => deleteDiary(d.id)} className="text-gray-300 hover:text-red-400"><Icons.Trash /></button>
-                                            </div>
-                                            {d.tags && d.tags.length > 0 && <div className="flex flex-wrap gap-2 mb-3">{d.tags.map(t=><span key={t} className="bg-blue-50 text-blue-500 text-xs px-2 py-1 rounded-md font-bold">#{t}</span>)}</div>}
-                                            <div className="text-capy-text font-medium whitespace-pre-wrap leading-relaxed">{d.text}</div>
-                                            {d.img && (
-                                                <div className="mt-4">
-                                                    <img src={d.img} className="w-full rounded-2xl border border-gray-100 mb-2" />
-                                                    <a href={d.img} download={`memory_${d.time}.jpg`} className="inline-block bg-capy-bg text-capy-primary text-xs font-bold py-2 px-4 rounded-xl border border-capy-secondary">📥 下載相片至裝置</a>
+                        {/* --- 列表頁：詳細紀錄 --- */}
+                        {activeTab === 'list' && (
+                            <div className="h-full flex flex-col animate-pop-in bg-white pt-10 px-6 overflow-y-auto pb-24">
+                                <h1 className="text-2xl font-black text-capy-text mb-6">所有事項庫</h1>
+                                {tasks.length === 0 ? (
+                                    <div className="text-center opacity-50 mt-10"><p className="font-bold">尚無紀錄</p></div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {tasks.map(task => {
+                                            const cat = categories.find(c => c.id === task.category) || categories[2];
+                                            return (
+                                                <div key={task.id} className={`p-4 rounded-2xl border flex items-center justify-between transition-all ${task.isTriggered ? 'bg-gray-50 border-gray-200 grayscale opacity-60' : 'bg-white border-capy-secondary shadow-sm'}`}>
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${task.isTriggered ? 'bg-gray-200' : 'bg-capy-header'}`}>
+                                                            {cat.icon}
+                                                        </div>
+                                                        <div>
+                                                            <h3 className={`font-bold text-base ${task.isTriggered ? 'line-through text-gray-400' : 'text-capy-text'}`}>{task.title}</h3>
+                                                            <div className="text-xs font-medium text-capy-light mt-1">
+                                                                {task.date.replace(/-/g, '/')} • {task.time}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button onClick={() => handleDelete(task.id)} className="p-2 text-gray-300 hover:text-red-400 active:scale-90 transition-transform">
+                                                        <Icons.Trash />
+                                                    </button>
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* --- Tab: Stats --- */}
-                        {activeTab === 'stats' && (
-                            <div className="h-full flex flex-col animate-pop-in bg-white px-6 pt-10 pb-6 overflow-y-auto">
-                                <h1 className="text-2xl font-black text-capy-text mb-1">能力圖鑑</h1>
-                                <p className="text-capy-light text-sm font-medium mb-6">掃描日記解鎖水豚專屬徽章！</p>
-                                <div className="bg-gradient-to-br from-[#85C1E9] to-[#3498DB] rounded-[2rem] p-6 text-white mb-6 shadow-lg shadow-blue-200">
-                                    <div className="font-bold text-sm mb-4 opacity-90">大數據生活雷達</div>
-                                    <div className="radar-grid">
-                                        <div className="radar-item"><div className="radar-header"><span>💼 工作效率</span><span>Lv.{Math.floor(stats.work/10)}</span></div><div className="stat-bar-bg"><div className="stat-bar-fill bg-white" style={{width: `${stats.work}%`}}></div></div></div>
-                                        <div className="radar-item"><div className="radar-header"><span>👨‍👩‍👧‍👦 家庭生活</span><span>Lv.{Math.floor(stats.family/10)}</span></div><div className="stat-bar-bg"><div className="stat-bar-fill bg-white" style={{width: `${stats.family}%`}}></div></div></div>
-                                        <div className="radar-item"><div className="radar-header"><span>💡 創意靈感</span><span>Lv.{Math.floor(stats.idea/10)}</span></div><div className="stat-bar-bg"><div className="stat-bar-fill bg-white" style={{width: `${stats.idea}%`}}></div></div></div>
-                                        <div className="radar-item"><div className="radar-header"><span>🏃 身心健康</span><span>Lv.{Math.floor(stats.health/10)}</span></div><div className="stat-bar-bg"><div className="stat-bar-fill bg-white" style={{width: `${stats.health}%`}}></div></div></div>
+                                            )
+                                        })}
                                     </div>
-                                    <button onClick={scanStats} className="mt-6 w-full bg-white/20 hover:bg-white/30 text-white font-bold py-3 rounded-xl transition-colors text-sm border border-white/40">🔍 啟動 AI 深度掃描</button>
-                                </div>
-                                <h3 className="font-bold text-capy-text mb-4">🎖️ 專屬徽章</h3>
-                                <div className="badge-grid">
-                                    <div className={`badge-item ${stats.work > 0 ? 'unlocked' : ''}`}><div className="badge-icon">💼{stats.work > 0 && <div className="badge-count">{Math.floor(stats.work/15)}</div>}</div><div className="text-[10px] font-bold">工作達人</div></div>
-                                    <div className={`badge-item ${stats.family > 0 ? 'unlocked' : ''}`}><div className="badge-icon">🏠{stats.family > 0 && <div className="badge-count">{Math.floor(stats.family/15)}</div>}</div><div className="text-[10px] font-bold">家庭守護</div></div>
-                                    <div className={`badge-item ${stats.idea > 0 ? 'unlocked' : ''}`}><div className="badge-icon">💡{stats.idea > 0 && <div className="badge-count">{Math.floor(stats.idea/15)}</div>}</div><div className="text-[10px] font-bold">靈感大師</div></div>
-                                    <div className={`badge-item ${stats.health > 0 ? 'unlocked' : ''}`}><div className="badge-icon">🏃{stats.health > 0 && <div className="badge-count">{Math.floor(stats.health/15)}</div>}</div><div className="text-[10px] font-bold">健康寶寶</div></div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* --- Tab: Game --- */}
-                        {activeTab === 'game' && (
-                            <div className="h-full flex flex-col pt-10 animate-pop-in bg-capy-bg">
-                                <MemoryTaskGame tasks={tasks} />
+                                )}
                             </div>
                         )}
                     </main>
 
-                    {/* --- Bottom Nav --- */}
-                    <nav className="absolute bottom-0 w-full h-[95px] bg-white/95 backdrop-blur-md rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] flex justify-around items-center px-4 z-20 border-t border-gray-100 pb-4">
-                        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 p-2 transition-all ${activeTab === 'home' ? 'text-capy-primary transform -translate-y-1' : 'text-gray-300'}`}><Icons.Home active={activeTab === 'home'} /><span className="text-[11px] font-bold">提醒</span></button>
-                        <button onClick={() => setActiveTab('diary')} className={`flex flex-col items-center gap-1 p-2 transition-all ${activeTab === 'diary' ? 'text-capy-primary transform -translate-y-1' : 'text-gray-300'}`}><Icons.Book active={activeTab === 'diary'} /><span className="text-[11px] font-bold">日記</span></button>
+                    {/* --- 底部導航列 --- */}
+                    <nav className="absolute bottom-0 w-full h-20 bg-white/90 backdrop-blur-md rounded-t-[2rem] shadow-[0_-5px_30px_rgba(0,0,0,0.05)] flex justify-around items-center px-8 z-20 border-t border-gray-100">
+                        <button onClick={() => { setActiveTab('home'); playTone('pop'); }} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'home' ? 'text-capy-primary' : 'text-gray-300'}`}>
+                            <Icons.Home />
+                        </button>
+
                         <div className="relative -top-6">
-                            <button onClick={() => { setIsSheetOpen(true); setSheetMode('menu'); }} className="bg-capy-primary text-white w-16 h-16 rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(220,165,125,0.4)] hover:brightness-105 active:scale-90 transition-transform border-4 border-capy-bg"><Icons.Plus /></button>
+                            <button 
+                                onClick={() => { setIsSheetOpen(true); playTone('pop'); }}
+                                className="bg-capy-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-capy-primary/30 hover:brightness-105 active:scale-90 transition-transform border-4 border-white"
+                            >
+                                <Icons.Plus />
+                            </button>
                         </div>
-                        <button onClick={() => setActiveTab('stats')} className={`flex flex-col items-center gap-1 p-2 transition-all ${activeTab === 'stats' ? 'text-capy-primary transform -translate-y-1' : 'text-gray-300'}`}><Icons.Star active={activeTab === 'stats'} /><span className="text-[11px] font-bold">圖鑑</span></button>
-                        <button onClick={() => setActiveTab('game')} className={`flex flex-col items-center gap-1 p-2 transition-all ${activeTab === 'game' ? 'text-capy-primary transform -translate-y-1' : 'text-gray-300'}`}><Icons.Gamepad active={activeTab === 'game'} /><span className="text-[11px] font-bold">遊戲</span></button>
+
+                        <button onClick={() => { setActiveTab('list'); playTone('pop'); }} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeTab === 'list' ? 'text-capy-primary' : 'text-gray-300'}`}>
+                            <Icons.Book />
+                        </button>
                     </nav>
 
-                    {/* --- Unified Bottom Sheet --- */}
+                    {/* --- 新增行程 Bottom Sheet (深度優化版) --- */}
                     {isSheetOpen && (
                         <div className="absolute inset-0 z-40 flex flex-col justify-end">
-                            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsSheetOpen(false)}></div>
-                            <div className="relative bg-white w-full rounded-t-[2.5rem] pt-6 pb-12 px-6 animate-slide-up shadow-2xl max-h-[90vh] overflow-y-auto">
-                                <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
-                                <div className="flex justify-between items-center mb-6 px-2">
-                                    <h2 className="text-xl font-black text-capy-text">
-                                        {sheetMode === 'menu' && "你想做什麼呢？"}
-                                        {sheetMode === 'reminder' && "🔔 新增提醒"}
-                                        {sheetMode === 'diary' && "✍️ 點滴紀錄與 AI 解析"}
-                                    </h2>
+                            <div className="absolute inset-0 bg-capy-text/30 backdrop-blur-sm transition-opacity" onClick={() => setIsSheetOpen(false)}></div>
+                            <div className="relative bg-white w-full rounded-t-[2.5rem] pt-5 pb-10 px-6 animate-slide-up shadow-2xl max-h-[90vh] overflow-y-auto">
+                                <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-5"></div>
+                                <div className="flex justify-between items-center mb-5">
+                                    <h2 className="text-xl font-bold flex items-center gap-2 text-capy-text"><span>📝</span> 新增提醒</h2>
                                     <button onClick={() => setIsSheetOpen(false)} className="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600"><Icons.Close /></button>
                                 </div>
-
-                                {sheetMode === 'menu' && (
-                                    <div className="flex gap-4 px-2">
-                                        <button onClick={() => setSheetMode('reminder')} className="flex-1 bg-orange-50 border-2 border-orange-100 text-orange-600 rounded-3xl p-6 flex flex-col items-center gap-3 active:scale-95 transition-transform"><span className="text-4xl">🔔</span><span className="font-bold">提醒事項</span></button>
-                                        <button onClick={() => setSheetMode('diary')} className="flex-1 bg-blue-50 border-2 border-blue-100 text-blue-600 rounded-3xl p-6 flex flex-col items-center gap-3 active:scale-95 transition-transform"><span className="text-4xl">📖</span><span className="font-bold">寫日記</span></button>
+                                
+                                <form onSubmit={handleAddTask} className="space-y-5">
+                                    {/* 智能分類標籤 */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-capy-light mb-2">分類</label>
+                                        <div className="flex gap-2">
+                                            {categories.map(cat => (
+                                                <button 
+                                                    key={cat.id} type="button" 
+                                                    onClick={() => { setCategory(cat.id); playTone('pop'); }}
+                                                    className={`flex-1 py-2 rounded-xl text-sm font-bold border transition-all ${category === cat.id ? cat.color + ' scale-105 shadow-sm' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
+                                                >
+                                                    {cat.icon} {cat.name}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                )}
 
-                                {sheetMode === 'reminder' && (
-                                    <form onSubmit={handleAddTask} className="space-y-4 px-2">
-                                        
-                                        {/* 深度重構：四大領域智能靈感庫 */}
-                                        <div className="bg-gray-50/70 p-4 rounded-2xl border border-gray-100 mb-2 shadow-inner">
-                                            <div className="text-xs font-bold text-gray-500 mb-3 flex items-center gap-1">
-                                                ✨ 智能靈感庫 (點擊展開)
-                                            </div>
-                                            
-                                            {/* 主分類選擇器 */}
-                                            <div className="flex gap-2 overflow-x-auto pb-1" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
-                                                {Object.entries(inspirationData).map(([key, data]) => {
-                                                    const isActive = selectedCategory === key;
-                                                    return (
-                                                        <button 
-                                                            type="button" 
-                                                            key={key}
-                                                            onClick={() => setSelectedCategory(isActive ? null : key)}
-                                                            className={`flex-1 min-w-[70px] flex flex-col items-center justify-center py-2 px-1 rounded-xl border transition-all duration-200 ${
-                                                                isActive 
-                                                                ? themeClasses[data.theme].activeCard + ' shadow-md scale-105' 
-                                                                : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 shadow-sm'
-                                                            }`}
-                                                        >
-                                                            <span className="text-2xl mb-1">{data.icon}</span>
-                                                            <span className="text-[10px] font-bold">{data.label}</span>
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-
-                                            {/* 子項目展開區 */}
-                                            {selectedCategory && (
-                                                <div className="animate-pop-in mt-3 pt-3 border-t border-dashed border-gray-200">
-                                                    <div className="text-[10px] text-gray-400 mb-2 font-bold pl-1">快速帶入事項：</div>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {inspirationData[selectedCategory].items.map((item, idx) => (
-                                                            <button
-                                                                type="button"
-                                                                key={idx}
-                                                                onClick={() => {
-                                                                    setTitle(`${inspirationData[selectedCategory].icon} ${item}`);
-                                                                    setShowSuggestions(false);
-                                                                }}
-                                                                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-transform active:scale-95 ${themeClasses[inspirationData[selectedCategory].theme].btn}`}
-                                                            >
-                                                                {item}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="relative mb-4">
-                                            <label className="block text-sm font-bold text-capy-light mb-2 ml-1">你要做什麼？ (自訂或從上方選擇)</label>
-                                            <input 
-                                                type="text" 
-                                                value={title} 
-                                                onChange={e => setTitle(e.target.value)} 
-                                                onFocus={() => setShowSuggestions(true)} 
-                                                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} 
-                                                placeholder="自由輸入事項..." 
-                                                className="w-full bg-white rounded-2xl px-5 py-4 outline-none font-medium text-capy-text border-2 border-transparent focus:border-capy-secondary focus:ring-4 focus:ring-capy-primary/10 shadow-sm transition-all" 
-                                                required 
-                                            />
-                                            {/* 歷史紀錄 Autocomplete */}
-                                            {showSuggestions && pastTitles.filter(t => t.toLowerCase().includes(title.toLowerCase()) && t !== title).length > 0 && (
-                                                <div className="absolute z-50 w-full bg-white mt-2 rounded-2xl shadow-xl border border-gray-100 max-h-48 overflow-y-auto">
-                                                    <div className="text-[10px] text-gray-400 font-bold px-4 pt-3 pb-1 bg-gray-50/80 sticky top-0 backdrop-blur-md">曾輸入過的紀錄</div>
-                                                    {pastTitles.filter(t => t.toLowerCase().includes(title.toLowerCase()) && t !== title).map((t, i) => (
-                                                        <div key={i} className="px-5 py-3 hover:bg-orange-50 cursor-pointer text-sm font-bold text-capy-text border-b border-gray-50 last:border-0 transition-colors" onMouseDown={() => { setTitle(t); setShowSuggestions(false); }}>
-                                                            <span className="text-gray-400 mr-2">🕒</span> {t}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="flex gap-4 pt-2">
-                                            <div className="flex-1"><label className="block text-sm font-bold text-capy-light mb-2 ml-1">日期</label><input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-white rounded-2xl px-4 py-4 outline-none font-medium text-capy-text border border-gray-100 shadow-sm" required /></div>
-                                            <div className="flex-1"><label className="block text-sm font-bold text-capy-light mb-2 ml-1">時間</label><input type="time" value={time} onChange={e => setTime(e.target.value)} className="w-full bg-white rounded-2xl px-4 py-4 outline-none font-medium text-capy-text border border-gray-100 shadow-sm" required /></div>
-                                        </div>
-
-                                        {/* 快捷時間按鈕 */}
-                                        <div className="flex gap-2 justify-center mt-2">
-                                            <button type="button" onClick={() => setQuickTime('10m')} className="flex-1 py-3 rounded-xl text-xs font-bold bg-white text-gray-500 border border-gray-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 active:scale-95 transition-all shadow-sm">10分鐘後</button>
-                                            <button type="button" onClick={() => setQuickTime('1h')} className="flex-1 py-3 rounded-xl text-xs font-bold bg-white text-gray-500 border border-gray-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 active:scale-95 transition-all shadow-sm">1小時後</button>
-                                            <button type="button" onClick={() => setQuickTime('tmr')} className="flex-1 py-3 rounded-xl text-xs font-bold bg-white text-gray-500 border border-gray-200 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 active:scale-95 transition-all shadow-sm">明天早上</button>
-                                        </div>
-
-                                        <button type="submit" className="w-full bg-capy-primary text-white font-black text-lg py-4 rounded-2xl mt-4 active:scale-95 transition-transform shadow-lg shadow-capy-primary/30 flex items-center justify-center gap-2">
-                                            <Icons.Bell /> 讓水豚幫你記住
-                                        </button>
-                                    </form>
-                                )}
-
-                                {sheetMode === 'diary' && (
-                                    <div className="px-2 space-y-5">
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                                            <div className="text-xs font-bold text-gray-400 mb-2">快速標籤</div>
-                                            <div className="flex flex-wrap gap-2">
-                                                <button onClick={() => toggleTag('工作')} className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${activeTags.includes('工作')?'bg-blue-100 text-blue-600 border-blue-200':'bg-white text-gray-500 border-gray-200'}`}>💼 工作</button>
-                                                <button onClick={() => toggleTag('家庭')} className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${activeTags.includes('家庭')?'bg-orange-100 text-orange-600 border-orange-200':'bg-white text-gray-500 border-gray-200'}`}>👨‍👩‍👧‍👦 家庭</button>
-                                                <button onClick={() => toggleTag('靈感')} className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${activeTags.includes('靈感')?'bg-purple-100 text-purple-600 border-purple-200':'bg-white text-gray-500 border-gray-200'}`}>💡 靈感</button>
-                                                <button onClick={() => toggleTag('健康')} className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${activeTags.includes('健康')?'bg-green-100 text-green-600 border-green-200':'bg-white text-gray-500 border-gray-200'}`}>🏃 健康</button>
-                                            </div>
-                                        </div>
-                                        
-                                        {!diaryImg ? (
-                                            <label className="flex flex-col items-center justify-center bg-blue-50 border-2 border-dashed border-blue-200 rounded-2xl p-6 cursor-pointer text-blue-500 active:scale-95 transition-transform">
-                                                <span className="text-3xl mb-2">📸</span><span className="font-bold text-sm">拍攝或上傳相片 (將自動極致壓縮)</span>
-                                                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                                            </label>
-                                        ) : (
-                                            <div className="relative">
-                                                <img src={diaryImg} className="w-full rounded-2xl border-4 border-white shadow-md object-cover max-h-48" />
-                                                <button onClick={() => setDiaryImg('')} className="absolute top-2 right-2 bg-white p-1.5 rounded-full shadow hover:text-red-500"><Icons.Close /></button>
-                                            </div>
-                                        )}
-                                        
-                                        <textarea className="w-full bg-capy-bg rounded-2xl p-4 border-none outline-none focus:ring-2 focus:ring-capy-secondary resize-none font-medium text-capy-text" rows="3" placeholder="記錄今天的點滴，AI 將為您分析並產生智慧提醒..." value={diaryText} onChange={e => setDiaryText(e.target.value)}></textarea>
-                                        <button onClick={handleAddDiary} className="w-full bg-gradient-to-r from-blue-400 to-blue-500 text-white font-black text-lg py-4 rounded-2xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                                            ⚡ 啟動 AI 儲存與分析
-                                        </button>
+                                    <div>
+                                        <label className="block text-xs font-bold text-capy-light mb-2">事項內容</label>
+                                        <input 
+                                            type="text" value={title} onChange={e => setTitle(e.target.value)} 
+                                            placeholder="例如：整理報表、買牛奶..." 
+                                            className="w-full bg-capy-bg rounded-xl px-4 py-3.5 outline-none font-medium text-capy-text focus:ring-2 focus:ring-capy-primary/50 border border-transparent focus:border-capy-primary/30 transition-all" 
+                                            required 
+                                        />
                                     </div>
-                                )}
+
+                                    <div className="flex gap-3">
+                                        <div className="flex-1">
+                                            <label className="block text-xs font-bold text-capy-light mb-2">日期</label>
+                                            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-capy-bg rounded-xl px-4 py-3 outline-none font-medium text-capy-text border border-transparent focus:ring-2 focus:ring-capy-primary/50" required />
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="block text-xs font-bold text-capy-light mb-2">時間</label>
+                                            <input type="time" value={time} onChange={e => setTime(e.target.value)} className="w-full bg-capy-bg rounded-xl px-4 py-3 outline-none font-medium text-capy-text border border-transparent focus:ring-2 focus:ring-capy-primary/50" required />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        <button type="button" onClick={() => setQuickTime('10m')} className="flex-1 py-2 rounded-xl text-xs font-bold bg-white text-capy-primary border border-capy-primary/30 active:bg-capy-header transition-colors">10分鐘後</button>
+                                        <button type="button" onClick={() => setQuickTime('1h')} className="flex-1 py-2 rounded-xl text-xs font-bold bg-white text-capy-primary border border-capy-primary/30 active:bg-capy-header transition-colors">1小時後</button>
+                                        <button type="button" onClick={() => setQuickTime('tmr')} className="flex-1 py-2 rounded-xl text-xs font-bold bg-white text-capy-primary border border-capy-primary/30 active:bg-capy-header transition-colors">明天</button>
+                                    </div>
+
+                                    <button type="submit" className="w-full bg-capy-primary text-white font-bold text-lg py-3.5 rounded-xl mt-2 active:scale-95 transition-transform shadow-lg shadow-capy-primary/30 flex justify-center items-center gap-2">
+                                        讓水豚記住
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     )}
 
-                    {/* --- 全螢幕到期提醒 --- */}
+                    {/* --- 全螢幕到期提醒 (精緻卡片版) --- */}
                     {activeAlert && (
-                        <div className="absolute inset-0 z-50 flex items-center justify-center p-6">
-                            <div className="absolute inset-0 bg-capy-bg/80 backdrop-blur-md"></div>
-                            <div className="relative w-full max-w-sm bg-white rounded-[3rem] p-8 flex flex-col items-center text-center animate-pop-in shadow-2xl overflow-hidden border border-gray-100">
-                                <div className="absolute top-0 inset-x-0 h-36 bg-capy-header rounded-b-[100%] pointer-events-none"></div>
-                                <div className="z-10 mb-2 bg-white p-3 rounded-[2rem] shadow-md border-2 border-white"><StackedCapybarasIcon className="w-28 h-36" animated={true} /></div>
+                        <div className="absolute inset-0 z-[7000] flex items-center justify-center p-6">
+                            <div className="absolute inset-0 bg-capy-text/60 backdrop-blur-sm" onClick={() => setActiveAlert(null)}></div>
+                            <div className="relative w-full max-w-sm bg-white rounded-3xl p-8 flex flex-col items-center text-center animate-pop-in shadow-2xl overflow-hidden border-2 border-capy-primary/20">
+                                <div className="absolute top-0 inset-x-0 h-32 bg-capy-header rounded-b-full pointer-events-none"></div>
+                                
+                                <div className="z-10 mb-4 bg-white p-2 rounded-full shadow-md border-4 border-capy-bg animate-bounce-slow">
+                                    <CuteCapyIcon className="w-24 h-24" />
+                                </div>
+                                
                                 <div className="mt-2 z-10 w-full">
-                                    <span className="inline-block bg-capy-primary/10 text-capy-primary font-bold px-4 py-1 rounded-full text-sm mb-4">🔔 時間到了</span>
-                                    <h2 className="text-2xl font-black text-capy-text mb-2 break-words">{activeAlert.title}</h2>
-                                    <p className="text-capy-light font-medium flex items-center justify-center gap-2 mb-8"><Icons.Bell /> {activeAlert.time}</p>
-                                    <button onClick={() => setActiveAlert(null)} className="w-full bg-capy-primary text-white font-bold text-xl py-4 rounded-full active:scale-95 transition-transform shadow-lg shadow-capy-primary/30">好的！</button>
+                                    <span className="inline-block bg-capy-accent text-white font-bold px-4 py-1 rounded-full text-xs mb-4 shadow-sm tracking-wider">
+                                        叮咚！時間到了
+                                    </span>
+                                    <h2 className="text-xl font-black text-capy-text mb-3 break-words leading-tight">{activeAlert.title}</h2>
+                                    <div className="flex justify-center items-center gap-4 text-capy-light font-bold text-sm mb-8 bg-gray-50 py-2 px-4 rounded-xl">
+                                        <span className="flex items-center gap-1"><Icons.Calendar /> {activeAlert.date}</span>
+                                        <span className="flex items-center gap-1"><Icons.Bell /> {activeAlert.time}</span>
+                                    </div>
+                                    <button onClick={() => { setActiveAlert(null); playTone('pop'); }} className="w-full bg-capy-primary text-white font-bold text-lg py-3.5 rounded-xl active:scale-95 transition-transform shadow-lg shadow-capy-primary/30">
+                                        收到啦！
+                                    </button>
                                 </div>
                             </div>
                         </div>
