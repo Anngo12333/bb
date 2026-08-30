@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI 育兒大數據管家 | 終極旗艦版</title>
+    <title>AI 育兒大數據管家 | 營養大師與蒙特梭利版</title>
     <style>
         :root { --p: #2C3E50; --bg: #F4F7F6; --c: #FFFFFF; --a: #E67E22; --blue: #3498DB; --purple: #9B59B6; --green: #27AE60; }
         body { font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: #333; margin: 0; height: 100vh; overflow: hidden; }
@@ -11,12 +11,10 @@
         #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(44, 62, 80, 0.95); color: white; padding: 12px 24px; border-radius: 30px; z-index: 3000; font-size: 14px; font-weight: bold; transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         #toast.show { top: 20px; } 
 
-        /* 自訂安全通知彈窗 (取代 alert/confirm) */
         #modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 4000; justify-content: center; align-items: center; backdrop-filter: blur(3px); animation: fadeIn 0.3s; }
         .modal-box { background: white; padding: 25px; border-radius: 20px; width: 80%; max-width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .modal-btn { background: var(--blue); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; margin-top: 15px; cursor: pointer; width: 100%; font-size: 16px; }
 
-        /* 鎖定畫面 */
         #login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: white; transition: opacity 0.4s; }
         .dots-container { display: flex; gap: 15px; margin: 30px 0; }
         .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); transition: 0.2s;} .dot.filled { background: white; border-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
@@ -24,18 +22,16 @@
         .key { width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; transition: all 0.1s; margin: auto; font-weight: 300; backdrop-filter: blur(5px); }
         .key:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
 
-        /* 主程式佈局 */
         #app { display: none; height: 100vh; overflow-y: auto; padding-bottom: 85px; box-sizing: border-box; }
-        .head { background: linear-gradient(135deg, var(--p), #34495E); color: #fff; padding: 25px 20px 35px 20px; text-align: center; border-radius: 0 0 30px 30px; position: sticky; top: 0; z-index: 50; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .head { background: linear-gradient(135deg, var(--p), #34495E); color: #fff; padding: 25px 20px 30px 20px; text-align: center; border-radius: 0 0 30px 30px; position: sticky; top: 0; z-index: 50; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
         .head h1 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: 1px; }
-        .weather-bar { background: rgba(255,255,255,0.15); margin-top: 15px; padding: 10px 20px; border-radius: 20px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); }
         
         .wrap { max-width: 600px; margin: -20px auto 20px auto; padding: 0 15px; position: relative; z-index: 60; }
         .card { background: var(--c); padding: 22px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid #FFF; }
         .title-txt { font-weight: 700; font-size: 18px; color: var(--p); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #F1F2F6; padding-bottom: 12px; }
         
-        .tag-sec { margin-bottom: 20px; }
-        .tag-sec-title { font-size: 13px; color: #7F8C8D; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; background: #F1F2F6; padding: 8px 12px; border-radius: 8px; }
+        .tag-sec { margin-bottom: 15px; background: #F8F9FA; padding: 12px; border-radius: 12px; border: 1px solid #E5E8E8; }
+        .tag-sec-title { font-size: 13px; color: #7F8C8D; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
         .tag-group { display: flex; flex-wrap: wrap; gap: 8px; }
         .tag-btn { background: #FFF; border: 1px solid #E5E8E8; padding: 8px 14px; border-radius: 20px; font-size: 13.5px; color: #444; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .tag-btn:active { transform: scale(0.92); }
@@ -44,18 +40,17 @@
         .tag-btn.active.learn { background: #EBF5FB; color: #2980B9; border-color: #85C1E9; }
         .tag-btn.active.mood { background: #F4ECF7; color: #8E44AD; border-color: #D2B4DE; }
         
-        /* 📍 地點快搜模組樣式 */
         .place-input-wrapper { position: relative; margin-bottom: 15px; }
-        .place-input { width: 100%; box-sizing: border-box; padding: 14px 16px 14px 40px; border-radius: 15px; border: 1px solid #BDC3C7; font-size: 15px; background: #FAFAFA; transition: 0.3s; color: var(--p); }
-        .place-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(52,152,219,0.15); background: #FFF; }
+        .place-input { width: 100%; box-sizing: border-box; padding: 14px 16px 14px 40px; border-radius: 15px; border: 1px solid #BDC3C7; font-size: 15px; background: #FFF; transition: 0.3s; color: var(--p); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);}
+        .place-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(52,152,219,0.15); }
         .place-icon { position: absolute; left: 14px; top: 14px; font-size: 16px; opacity: 0.7; }
-        .suggestions-box { position: absolute; top: 100%; left: 0; right: 0; background: #FFF; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); z-index: 100; max-height: 180px; overflow-y: auto; display: none; margin-top: 5px; border: 1px solid #E5E8E8; }
+        .suggestions-box { position: absolute; top: 100%; left: 0; right: 0; background: #FFF; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); z-index: 100; max-height: 220px; overflow-y: auto; display: none; margin-top: 5px; border: 1px solid #E5E8E8; }
         .suggestion-item { padding: 12px 16px; border-bottom: 1px solid #F1F2F6; cursor: pointer; font-size: 14.5px; color: #555; display: flex; align-items: center; gap: 10px; font-weight: 500;}
         .suggestion-item:last-child { border-bottom: none; }
         .suggestion-item:active { background: #F8F9FA; color: var(--blue); }
 
-        textarea { width: 100%; box-sizing: border-box; padding: 16px; border-radius: 15px; border: 1px solid #BDC3C7; margin-bottom: 15px; font-size: 15px; background: #FAFAFA; resize: vertical; transition: 0.3s; line-height: 1.6; }
-        textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(52,152,219,0.15); background: #FFF; }
+        textarea { width: 100%; box-sizing: border-box; padding: 16px; border-radius: 15px; border: 1px solid #BDC3C7; margin-bottom: 15px; font-size: 15px; background: #FFF; resize: vertical; transition: 0.3s; line-height: 1.6; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);}
+        textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(52,152,219,0.15); }
         .up-area { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #F8F9FA; padding: 25px; border-radius: 15px; margin-bottom: 20px; color: var(--blue); font-weight: 600; border: 2px dashed #AED6F1; cursor: pointer; transition: 0.2s; gap: 10px; }
         .up-area span { font-size: 32px; }
         img.pre { max-width: 100%; border-radius: 15px; display: none; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #FFF; }
@@ -86,15 +81,13 @@
         .stat-bar-bg { flex: 1; height: 10px; background: #E5E8E8; border-radius: 5px; overflow: hidden; }
         .stat-bar-fill { height: 100%; border-radius: 5px; transition: width 1s; width: 0%; }
         .info-box { padding: 18px; border-radius: 15px; margin-bottom: 18px; font-size: 15px; line-height: 1.7; }
-        .box-food { background: #E8F8F5; border-left: 6px solid #1ABC9C; color: #117A65; }
         .box-recipe { background: #FEF9E7; border-left: 6px solid #F1C40F; color: #9A7D0A; }
-        .box-tips { background: #F4ECF7; border-left: 6px solid #9B59B6; color: #7D3C98; }
         .box-psy { background: #FDEDEC; border-left: 6px solid #E74C3C; color: #C0392B; }
+        .box-tips { background: #F4ECF7; border-left: 6px solid #9B59B6; color: #7D3C98; }
         
-        /* 🍽️ 營養食譜專用樣式 */
         .recipe-item { background: #FFF; border: 1px solid #E5E8E8; border-radius: 15px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; }
         .r-title { font-size: 17px; font-weight: 800; color: #D35400; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
-        .r-badge { background: #FDEBD0; color: #E67E22; font-size: 11px; padding: 4px 8px; border-radius: 8px; }
+        .r-badge { background: #FDEBD0; color: #E67E22; font-size: 11px; padding: 4px 8px; border-radius: 8px; font-weight: bold;}
         .r-section { margin-top: 12px; font-size: 14.5px; color: #444; line-height: 1.6; }
         .r-montessori { margin-top: 12px; background: #E8F8F5; padding: 12px; border-radius: 10px; color: #117A65; font-size: 14px; font-weight: 600; display: flex; gap: 8px; align-items: flex-start;}
 
@@ -106,27 +99,27 @@
         .tab { display: none; animation: fadeIn 0.4s; } .tab.on { display: block; }
         @keyframes fadeIn { from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);} }
         .loader { display: none; text-align: center; padding: 25px; color: var(--blue); font-weight: 600; font-size: 15px; }
+        
+        .highlight-badge { display:inline-block; background:#EBF5FB; color:#2980B9; border-radius:12px; padding:2px 8px; font-size:11px; margin-right:6px; font-weight:bold; border:1px solid #AED6F1; }
     </style>
 </head>
 <body>
 
-<!-- 安全通知彈窗 (代替 alert) -->
 <div id="toast">💡 <span id="toast-msg"></span></div>
 
 <div id="modal-overlay">
     <div class="modal-box">
         <div style="font-size: 40px; margin-bottom: 10px;">🛡️</div>
-        <h3 style="margin: 0 0 10px 0; color: #2C3E50;">安全提示</h3>
+        <h3 style="margin: 0 0 10px 0; color: #2C3E50;">系統提示</h3>
         <p id="modal-text" style="color: #7F8C8D; font-size: 14px; line-height: 1.5; margin-bottom: 20px;"></p>
         <button class="modal-btn" onclick="document.getElementById('modal-overlay').style.display='none'">確定</button>
     </div>
 </div>
 
-<!-- 密碼鎖畫面 -->
 <div id="login-screen">
     <div style="font-size: 60px; margin-bottom:20px; text-shadow: 0 4px 15px rgba(0,0,0,0.3);">🧠</div>
     <h2 style="margin:0; letter-spacing: 2px; font-weight: 800;">3-6歲 育兒大腦管家</h2>
-    <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin-top: 10px;">🛡️ 終極旗艦版 (無損架構)</p>
+    <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin-top: 10px;">營養食譜大數據 | 蒙特梭利旗艦版</p>
     <div class="dots-container" id="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
     <div class="keypad">
         <div class="key" onclick="press('1')">1</div><div class="key" onclick="press('2')">2</div><div class="key" onclick="press('3')">3</div>
@@ -139,16 +132,16 @@
 <div id="app">
     <div class="head">
         <h1>學齡前育兒分析儀表板</h1>
-        <div class="weather-bar" id="weather-widget">☁️ 本地天氣推算中...</div>
+        <div style="font-size: 12px; color: #AAB7B8; margin-top: 5px;">Pure Focus Mode</div>
     </div>
     
     <div class="wrap">
-        <!-- 分頁 1: 智能紀錄 (Smart Journal) -->
+        <!-- 分頁 1: 智能紀錄 -->
         <div id="t-rec" class="tab on">
             <div class="card">
-                <div class="title-txt">✍️ 情境與行為紀錄</div>
+                <div class="title-txt">✍️ 情境與行為點滴紀錄</div>
                 
-                <div class="tag-sec" data-category="diet">
+                <div class="tag-sec">
                     <div class="tag-sec-title">🍼 飲食與自理 (Practical Life)</div>
                     <div class="tag-group">
                         <div class="tag-btn diet" onclick="toggleTag(this, '自己吃飯', 'diet')">🥄 自己吃飯</div>
@@ -158,7 +151,7 @@
                     </div>
                 </div>
                 
-                <div class="tag-sec" data-category="act">
+                <div class="tag-sec">
                     <div class="tag-sec-title">🏃 探索與操作 (Motor Skills)</div>
                     <div class="tag-group">
                         <div class="tag-btn act" onclick="toggleTag(this, '公園放電', 'act')">🛝 公園放電</div>
@@ -167,7 +160,7 @@
                     </div>
                 </div>
                 
-                <div class="tag-sec" data-category="learn">
+                <div class="tag-sec">
                     <div class="tag-sec-title">🧠 認知與情緒 (Cognitive & Social)</div>
                     <div class="tag-group">
                         <div class="tag-btn learn" onclick="toggleTag(this, '問為什麼', 'learn')">❓ 問為什麼</div>
@@ -178,57 +171,29 @@
                     </div>
                 </div>
 
-                <!-- 🍎 雙語食材字典與智能快搜 (Bilingual Food Dictionary) -->
-                <div class="tag-sec" data-category="food">
-                    <div class="tag-sec-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                        <span>🍏 雙語食材字典 (Food Dictionary)</span>
-                        <div style="position:relative;">
-                            <span style="position:absolute; left:10px; top:8px; font-size:12px; opacity:0.6;">🔍</span>
-                            <input type="text" id="foodSearch" placeholder="搜尋食材 (如: 蘋果, Apple)" style="padding:8px 10px 8px 30px; border-radius:12px; border:1px solid #BDC3C7; font-size:13px; width:180px; margin:0; outline:none;" onkeyup="filterFoodTags(this.value)">
-                        </div>
-                    </div>
-                    <div class="tag-group" id="food-tag-group" style="max-height: 140px; overflow-y: auto; background: #FFF; padding: 12px; border: 1px solid #E5E8E8; border-radius: 12px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
-                        <!-- 水果 Fruits -->
-                        <div class="tag-btn diet" onclick="toggleTag(this, '蘋果 Apple', 'diet')">🍎 蘋果 Apple</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '香蕉 Banana', 'diet')">🍌 香蕉 Banana</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '藍莓 Blueberry', 'diet')">🫐 藍莓 Blueberry</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '草莓 Strawberry', 'diet')">🍓 草莓 Strawberry</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '酪梨 Avocado', 'diet')">🥑 酪梨 Avocado</div>
-                        <!-- 蔬菜 Veggies -->
-                        <div class="tag-btn diet" onclick="toggleTag(this, '花椰菜 Broccoli', 'diet')">🥦 花椰菜 Broccoli</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '菠菜 Spinach', 'diet')">🥬 菠菜 Spinach</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '南瓜 Pumpkin', 'diet')">🎃 南瓜 Pumpkin</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '番茄 Tomato', 'diet')">🍅 番茄 Tomato</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '紅蘿蔔 Carrot', 'diet')">🥕 紅蘿蔔 Carrot</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '地瓜 Sweet Potato', 'diet')">🍠 地瓜 Sweet Potato</div>
-                        <!-- 蛋白質 Proteins -->
-                        <div class="tag-btn diet" onclick="toggleTag(this, '鮭魚 Salmon', 'diet')">🐟 鮭魚 Salmon</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '雞蛋 Egg', 'diet')">🥚 雞蛋 Egg</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '鮮奶 Milk', 'diet')">🥛 鮮奶 Milk</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '牛肉 Beef', 'diet')">🥩 牛肉 Beef</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '雞肉 Chicken', 'diet')">🍗 雞肉 Chicken</div>
-                        <!-- 碳水 Carbs -->
-                        <div class="tag-btn diet" onclick="toggleTag(this, '燕麥 Oat', 'diet')">🌾 燕麥 Oat</div>
-                        <div class="tag-btn diet" onclick="toggleTag(this, '米飯 Rice', 'diet')">🍚 米飯 Rice</div>
-                    </div>
+                <!-- 🍎 雙語食材與自由快搜模組 -->
+                <div class="place-input-wrapper">
+                    <span class="place-icon">🍎</span>
+                    <input type="text" id="foodInput" class="place-input" placeholder="搜尋或新增食材 (支援中英: 蘋果, Apple)" onkeyup="suggestFood(this.value)" onfocus="suggestFood(this.value)" autocomplete="off">
+                    <div id="foodSuggestions" class="suggestions-box"></div>
                 </div>
 
-                <!-- 📍 隱形地點快搜模組 (Self-Building Place DB) -->
+                <!-- 📍 地點快搜模組 -->
                 <div class="place-input-wrapper">
                     <span class="place-icon">📍</span>
-                    <input type="text" id="placeInput" class="place-input" placeholder="新增地點 (如：香港科學館)... 支援智能快搜" onkeyup="suggestPlaces(this.value)" onfocus="suggestPlaces(this.value)" autocomplete="off">
+                    <input type="text" id="placeInput" class="place-input" placeholder="新增地點 (如：蒙特梭利教室)..." onkeyup="suggestPlaces(this.value)" onfocus="suggestPlaces(this.value)" autocomplete="off">
                     <div id="placeSuggestions" class="suggestions-box"></div>
                 </div>
 
                 <label class="up-area" id="upL">
                     <span>📸</span>
-                    <span style="font-size: 15px;">拍攝或上傳相片 (支援原生無損下載)</span>
+                    <span style="font-size: 15px;">拍攝或上傳相片 (將自動極致壓縮)</span>
                     <input type="file" accept="image/*" style="display:none" id="imgInput" onchange="preview(this)">
                 </label>
                 <img id="pre" class="pre">
                 <canvas id="compressCanvas" style="display:none;"></canvas>
                 
-                <textarea id="txt" rows="4" placeholder="大數據庫已就緒。&#10;請記錄孩子今天的行為或飲食，AI 將給予大腦神經與心理學解析..."></textarea>
+                <textarea id="txt" rows="4" placeholder="大數據庫已就緒。請記錄孩子今天的行為或飲食，AI 將給予大腦神經與心理學解析..."></textarea>
                 
                 <button class="btn" id="sBtn" onclick="submitData()">
                     ⚡ 啟動 3-6 歲語意特徵分析
@@ -236,7 +201,6 @@
                 <div id="load" class="loader">⏳ 正在與幼兒心理學/營養學資料庫比對...</div>
             </div>
             
-            <!-- AI 分析結果呈現區 -->
             <div id="res" class="card" style="display:none; animation: fadeIn 0.5s;">
                 <h3 id="r-tag" style="margin-top:0; color: var(--blue);"></h3>
                 
@@ -250,17 +214,16 @@
                     💬 <span id="r-beh"></span>
                 </div>
                 
-                <div class="info-box box-psy" id="r-psy-box">
+                <div class="info-box box-psy">
                     <strong>🧠 兒童心理與發展解析</strong><br>
                     <span id="r-psy"></span>
                 </div>
 
-                <div class="info-box box-tips" id="r-tips-box">
+                <div class="info-box box-tips">
                     <strong>🎓 教養與神經科學建議</strong><br>
                     <span id="r-tips"></span>
                 </div>
 
-                <!-- 雙引擎聯動食譜顯示區 -->
                 <div class="info-box box-recipe" id="r-recipe-box">
                     <strong>👨‍🍳 大腦發育營養補強菜單：<span id="r-rname"></span></strong>
                     <b>🛒 採買清單：</b><div style="font-family:monospace; margin:8px 0; white-space: pre-wrap; background:rgba(255,255,255,0.7); padding:10px; border-radius:8px;" id="r-ring"></div>
@@ -275,23 +238,21 @@
         <!-- 🍽️ 分頁 2: 營養食譜 (Manual Recipe Hub) -->
         <div id="t-recipe" class="tab">
             <div class="card">
-                <div class="title-txt">👨‍🍳 3-6歲 蒙特梭利食譜庫</div>
-                <div style="font-size: 13.5px; color: #7F8C8D; margin-bottom: 15px;">精確份量與腦神經營養學設計，每道菜均附蒙特梭利廚房參與建議。</div>
+                <div class="title-txt">👨‍🍳 3-6歲 蒙特梭利食譜大數據</div>
+                <div style="font-size: 13.5px; color: #7F8C8D; margin-bottom: 15px; line-height:1.5;">極致擴充！針對幼兒腦神經元發育設計，包含 DHA、鐵質、鋅等關鍵營養，每道菜均附蒙特梭利廚房參與建議。</div>
                 
-                <!-- 食譜篩選器 -->
                 <div class="tag-group" style="margin-bottom: 20px; justify-content: center;">
                     <div class="tag-btn active diet" id="filter-all" onclick="filterRecipe('all', this)">全部</div>
-                    <div class="tag-btn" onclick="filterRecipe('main', this)">🍛 主食</div>
-                    <div class="tag-btn" onclick="filterRecipe('breakfast', this)">🍳 早餐</div>
-                    <div class="tag-btn" onclick="filterRecipe('snack', this)">🧁 點心護腦</div>
+                    <div class="tag-btn" onclick="filterRecipe('main', this)">🍛 護腦主食</div>
+                    <div class="tag-btn" onclick="filterRecipe('breakfast', this)">🍳 活力早餐</div>
+                    <div class="tag-btn" onclick="filterRecipe('snack', this)">🧁 情緒點心</div>
                 </div>
 
-                <!-- 食譜列表渲染區 -->
                 <div id="recipe-list-container"></div>
             </div>
         </div>
 
-        <!-- 分頁 3: 探索圖鑑 (Discovery & Talent Scan) -->
+        <!-- 分頁 3: 探索圖鑑 -->
         <div id="t-disc" class="tab">
             <div class="card" style="background: transparent; box-shadow: none; padding: 0;">
                 <div class="level-card">
@@ -325,12 +286,10 @@
                     <div class="badge-grid" id="badge-container"></div>
                 </div>
 
-                <!-- 💡 創新研究功能：AI 潛能與天賦軌跡分析 -->
                 <div class="card" id="talent-card" style="display:none; animation: fadeIn 0.5s;">
                     <div class="title-txt" style="color: #8E44AD;"><span>🧬 AI 多元智能與天賦預測</span></div>
-                    <div style="font-size: 13px; color: #7F8C8D; margin-bottom: 15px;">基於加德納(Howard Gardner)多元智能理論，深度掃描歷史數據發掘寶寶優勢。</div>
-                    <div id="talent-content" style="background: #F4ECF7; padding: 15px; border-radius: 12px; border-left: 5px solid #9B59B6; font-size: 14.5px; color: #5B2C6F; line-height: 1.6;">
-                    </div>
+                    <div style="font-size: 13px; color: #7F8C8D; margin-bottom: 15px;">基於 Howard Gardner 多元智能理論，深度掃描歷史數據發掘寶寶優勢。</div>
+                    <div id="talent-content" style="background: #F4ECF7; padding: 15px; border-radius: 12px; border-left: 5px solid #9B59B6; font-size: 14.5px; color: #5B2C6F; line-height: 1.6;"></div>
                 </div>
 
                 <button class="btn" id="scanBtn" onclick="scanLocalData()" style="background: linear-gradient(135deg, #9B59B6, #8E44AD);">
@@ -340,7 +299,7 @@
             </div>
         </div>
 
-        <!-- 分頁 4: 歷史庫 (Memory & Backup) -->
+        <!-- 分頁 4: 歷史庫 -->
         <div id="t-mem" class="tab">
             <div class="card">
                 <div class="title-txt">💾 雲端時光庫 (本地加密)</div>
@@ -357,9 +316,8 @@
         </div>
     </div>
 
-    <!-- 底部導覽 (四個分頁) -->
     <div class="nav">
-        <div class="n-item on" onclick="nav('rec',this)"><span>✍️</span>智能紀錄</div>
+        <div class="n-item on" onclick="nav('rec',this)"><span>✍️</span>日常紀錄</div>
         <div class="n-item" onclick="nav('recipe',this)"><span>🍽️</span>營養食譜</div>
         <div class="n-item" onclick="nav('disc',this)"><span>🧭</span>能力圖鑑</div>
         <div class="n-item" onclick="nav('mem',this)"><span>📖</span>時光庫</div>
@@ -368,170 +326,153 @@
 
 <script>
     // =================================================================
-    // 🗄️ 虛擬資料庫 1：食譜巨量資料庫 (Recipe Database)
-    // 包含營養科學與蒙特梭利實務指導
+    // 🗄️ 大數據區塊 1：雙語食材與營養字典 (Bilingual Food DB)
+    // 深度研究：3-6歲幼兒黃金食材
     // =================================================================
-    const recipeDatabase = [
-        {
-            id: 'r_main_01', type: 'main', 
-            name: "手抓自主訓練：鮮蔬一口飯糰", 
-            nutrition: "豐富碳水化合物與維生素，適合訓練咀嚼",
-            shopping_list: "- 白飯 1碗 (約120g)\n- 鮭魚鬆/海苔 20g\n- 熟紅蘿蔔丁 少許", 
-            steps: "將食材拌勻，裝入乾淨的食品塑膠袋中，捏成直徑約 3 公分的小飯糰。", 
-            montessori: "邀請孩子親自用手隔著塑膠袋捏飯糰。自己捏的飯糰能極大增加進食成就感！"
-        },
-        {
-            id: 'r_main_02', type: 'main', 
-            name: "補鐵護腦：菠菜牛肉軟飯", 
-            nutrition: "豐富鐵質與蛋白質，大腦海馬迴發育關鍵",
-            shopping_list: "- 牛絞肉 40g\n- 新鮮菠菜 30g\n- 軟飯 50g", 
-            steps: "1. 菠菜燙過切極碎去草酸。\n2. 牛肉炒香，加入菠菜與軟飯悶煮3分鐘。", 
-            montessori: "準備一個小水盆，讓孩子練習用手一片片清洗菠菜葉，訓練精細動作與責任感。"
-        },
-        {
-            id: 'r_main_03', type: 'main', 
-            name: "隱形魔法：香甜南瓜濃湯 (抗恐新症)", 
-            nutrition: "南瓜富含 Beta 胡蘿蔔素，提升上呼吸道免疫力",
-            shopping_list: "- 南瓜 100g\n- 洋蔥 1/4顆\n- 鮮奶 50ml", 
-            steps: "將南瓜與炒香的洋蔥打成泥，加入鮮奶。利用南瓜天然的甜味掩蓋其他蔬菜質地。", 
-            montessori: "讓孩子負責用安全切刀切軟爛的熟南瓜塊，或用湯匙將南瓜挖入果汁機中。"
-        },
-        {
-            id: 'r_main_04', type: 'main', 
-            name: "兒童參與：手撕高麗菜炒肉片", 
-            nutrition: "高麗菜提供優質膳食纖維，維持腸道健康(腸腦軸線)",
-            shopping_list: "- 高麗菜 1/4顆\n- 豬肉片 50g", 
-            steps: "高麗菜洗淨撕碎，與肉片同炒，加少許天然鹽調味。", 
-            montessori: "完全不需要刀具！邀請孩子坐在餐桌旁，將高麗菜葉一片片「撕」成小塊。參與感能提升60%接受度。"
-        },
-        {
-            id: 'r_snack_01', type: 'snack', 
-            name: "大腦健康甜點：藍莓燕麥優格", 
-            nutrition: "花青素(護眼) + 低GI燕麥(穩定血糖，防情緒暴躁)",
-            shopping_list: "- 無糖希臘優格 1小杯\n- 新鮮藍莓 10顆\n- 原味燕麥片 1匙", 
-            steps: "將所有材料混合即可。若怕燕麥太硬，可提前一晚泡入優格中軟化。", 
-            montessori: "準備一個小碗與專屬小湯匙，讓孩子自己練習將藍莓『舀』進優格碗裡，訓練手眼協調。"
-        },
-        {
-            id: 'r_snack_02', type: 'snack', 
-            name: "專注力補給：核桃芝麻糊", 
-            nutrition: "高鈣(芝麻) + 卵磷脂(核桃)，提升神經傳導效率",
-            shopping_list: "- 黑芝麻粉 1匙\n- 碎核桃 少許(確認無過敏)\n- 鮮奶 100ml", 
-            steps: "鮮奶微波溫熱，拌入黑芝麻粉與壓碎的核桃末。", 
-            montessori: "讓孩子將核桃放入夾鏈袋中，用木槌或小杯底『敲碎』，這不僅是食物準備，也是極佳的情緒發洩管道。"
-        },
-        {
-            id: 'r_breakfast_01', type: 'breakfast', 
-            name: "助眠/安神：櫻花蝦蒸蛋", 
-            nutrition: "褪黑激素前驅物(雞蛋) + 極高天然鈣質(安定神經)",
-            shopping_list: "- 雞蛋 1顆\n- 無鹽櫻花蝦 少許\n- 高湯 50ml", 
-            steps: "雞蛋打散加入高湯與櫻花蝦，放入電鍋蒸約10分鐘至凝固。", 
-            montessori: "『打蛋』是 3 歲以上孩子最愛的挑戰！教導他們在碗邊輕敲，並給予一把小打蛋器練習均勻攪拌。"
-        },
-        {
-            id: 'r_breakfast_02', type: 'breakfast', 
-            name: "穩定情緒：香蕉溫牛奶", 
-            nutrition: "豐富鎂與色胺酸，啟動副交感神經",
-            shopping_list: "- 熟透香蕉 半根\n- 溫鮮奶 100ml", 
-            steps: "香蕉切片或壓泥，與溫熱鮮奶混合。適合在睡前或情緒風暴後飲用。", 
-            montessori: "香蕉非常適合使用幼兒安全塑膠刀練習『切片』。孩子專注切片的過程，本身就有平靜情緒的作用。"
-        },
-        {
-            id: 'r_main_05', type: 'main',
-            name: "Omega-3 大腦火箭：酪梨鮭魚拌飯",
-            nutrition: "極豐富DHA與優質脂肪，促進腦神經突觸生長",
-            shopping_list: "- 無刺鮭魚 40g\n- 熟透酪梨 1/4顆\n- 白飯 50g",
-            steps: "鮭魚煎熟壓碎。酪梨切小塊。將兩者與熱飯輕輕拌勻即可。",
-            montessori: "讓孩子用安全的奶油刀將軟嫩的酪梨『切塊』，這對手部力道控制是很好的練習。"
-        }
+    const foodDictionary = [
+        { tw: '蘋果', en: 'Apple', tag: '腸腦軸線/纖維' },
+        { tw: '香蕉', en: 'Banana', tag: '色胺酸/平穩情緒' },
+        { tw: '藍莓', en: 'Blueberry', tag: '花青素/護眼' },
+        { tw: '草莓', en: 'Strawberry', tag: '維生素C/抗氧化' },
+        { tw: '奇異果', en: 'Kiwi', tag: '高維C/鐵質吸收' },
+        { tw: '櫻桃', en: 'Cherry', tag: '褪黑激素/助眠' },
+        { tw: '火龍果', en: 'Dragon Fruit', tag: '花青素/順暢排便' },
+        { tw: '酪梨', en: 'Avocado', tag: '優質脂肪/大腦發育' },
+        { tw: '花椰菜', en: 'Broccoli', tag: '葉酸/神經管發育' },
+        { tw: '菠菜', en: 'Spinach', tag: '鐵質/預防貧血' },
+        { tw: '南瓜', en: 'Pumpkin', tag: 'Beta胡蘿蔔素/免疫力' },
+        { tw: '番茄', en: 'Tomato', tag: '茄紅素/抗發炎' },
+        { tw: '紅蘿蔔', en: 'Carrot', tag: '維生素A/視力' },
+        { tw: '櫛瓜', en: 'Zucchini', tag: '高鉀/低熱量' },
+        { tw: '蘆筍', en: 'Asparagus', tag: '葉酸/益生元' },
+        { tw: '鮭魚', en: 'Salmon', tag: 'DHA/海馬迴' },
+        { tw: '鱈魚', en: 'Cod', tag: '優質蛋白/好消化' },
+        { tw: '雞蛋', en: 'Egg', tag: '膽鹼/記憶力' },
+        { tw: '牛肉', en: 'Beef', tag: '高鐵質/肌肉生長' },
+        { tw: '雞肉', en: 'Chicken', tag: '低脂蛋白/胺基酸' },
+        { tw: '豆腐', en: 'Tofu', tag: '植物蛋白/鈣質' },
+        { tw: '毛豆', en: 'Edamame', tag: '植物蛋白/葉酸' },
+        { tw: '鮮奶', en: 'Milk', tag: '鈣質/安定神經' },
+        { tw: '燕麥', en: 'Oat', tag: '低GI/穩定血糖' },
+        { tw: '糙米', en: 'Brown Rice', tag: '維生素B群/神經修復' },
+        { tw: '藜麥', en: 'Quinoa', tag: '超級食物/完全蛋白' },
+        { tw: '馬鈴薯', en: 'Potato', tag: '抗性澱粉/腸道健康' },
+        { tw: '地瓜', en: 'Sweet Potato', tag: '膳食纖維/順暢' }
     ];
 
     // =================================================================
-    // 🗄️ 虛擬資料庫 2：AI 情境大數據庫 (AI Journal Logic)
-    // 融合：神經科學、腸腦軸線、蒙特梭利、皮亞傑
+    // 🗄️ 大數據區塊 2：蒙特梭利營養食譜旗艦庫 (Massive Recipe Hub)
+    // =================================================================
+    const recipeDatabase = [
+        // --- 早餐類 (Breakfast) ---
+        { id: 'r_bf_01', type: 'breakfast', name: "助眠安神：櫻花蝦蒸蛋", nutrition: "褪黑激素前驅物(雞蛋) + 極高天然鈣質(安定神經)", shopping_list: "- 雞蛋 1顆\n- 無鹽櫻花蝦 少許\n- 高湯 50ml", steps: "雞蛋打散加入高湯與櫻花蝦，放入電鍋蒸約10分鐘至凝固。", montessori: "『打蛋』是 3 歲以上孩子最愛的挑戰！教導他們在碗邊輕敲，並給予一把小打蛋器練習均勻攪拌。" },
+        { id: 'r_bf_02', type: 'breakfast', name: "大腦火箭：酪梨鮮蝦吐司", nutrition: "DHA(鮮蝦) + 優質Omega-9脂肪(酪梨)，促進腦神經突觸生長", shopping_list: "- 全麥吐司 1片\n- 熟透酪梨 1/4顆\n- 鮮蝦 3隻", steps: "鮮蝦燙熟切碎。酪梨壓成泥塗抹在烤好的吐司上，撒上蝦碎。", montessori: "給孩子一把安全的奶油抹刀，練習將酪梨泥『均勻塗抹』在吐司上，這是絕佳的精細動作與力道控制訓練。" },
+        { id: 'r_bf_03', type: 'breakfast', name: "穩定血糖：燕麥蘋果無粉煎餅", nutrition: "低GI燕麥與天然果糖，防止早上血糖飆升引起情緒暴躁", shopping_list: "- 原味燕麥 30g\n- 雞蛋 1顆\n- 蘋果 1/4顆 (刨絲)", steps: "燕麥泡軟與雞蛋、蘋果絲混勻。平底鍋少油慢煎至兩面金黃。", montessori: "讓孩子用刨絲器(需家長握著手)將蘋果刨絲，感受不同質地的變化，並負責將麵糊『舀』入鍋中。" },
+        { id: 'r_bf_04', type: 'breakfast', name: "免疫力滿分：南瓜鮮奶饅頭", nutrition: "南瓜Beta胡蘿蔔素，提升上呼吸道抵抗力", shopping_list: "- 熟南瓜泥 50g\n- 麵粉 150g\n- 酵母 2g\n- 鮮奶 40ml", steps: "材料揉成光滑麵糰，發酵後切塊，蒸15分鐘。", montessori: "這根本是可食用的黏土！邀請孩子一起『揉麵糰』，這種深層本體覺的按壓能大幅降低孩子的焦慮感。" },
+
+        // --- 主食類 (Mains) ---
+        { id: 'r_main_01', type: 'main', name: "手抓自主訓練：鮮蔬一口飯糰", nutrition: "豐富碳水化合物與多樣微量元素，適合訓練咀嚼", shopping_list: "- 軟飯 1碗 (約100g)\n- 鮭魚鬆 15g\n- 熟紅蘿蔔丁 少許", steps: "將食材拌勻，裝入乾淨的食品塑膠袋中，捏成直徑約 3 公分的小飯糰。", montessori: "邀請孩子親自用手隔著塑膠袋『捏飯糰』。自己捏的飯糰能極大增加進食成就感，解決挑食問題！" },
+        { id: 'r_main_02', type: 'main', name: "補鐵補氧：菠菜牛肉軟飯", nutrition: "高生物價鐵質與蛋白質，大腦海馬迴與肌肉發育關鍵", shopping_list: "- 牛絞肉 40g\n- 新鮮菠菜 30g\n- 軟飯 50g", steps: "菠菜燙過切極碎去草酸。牛肉炒香，加入菠菜與軟飯悶煮3分鐘。", montessori: "準備一個小水盆，讓孩子練習用手一片片『清洗菠菜葉』，訓練精細動作與為家庭付出的責任感。" },
+        { id: 'r_main_03', type: 'main', name: "神經修復：鮮菇藜麥雞肉燉飯", nutrition: "超級食物藜麥(完全蛋白) + 多醣體，穩定神經與免疫", shopping_list: "- 藜麥與白米 1:1 共50g\n- 雞胸肉丁 40g\n- 鴻喜菇 少許", steps: "雞肉與菇類炒香，加入洗淨的藜麥米與高湯，燉煮15分鐘至軟爛。", montessori: "讓孩子負責將鴻喜菇一根一根『撕開』。這項工作完全不需要刀具，安全且極度吸引 3-4 歲幼兒的注意力。" },
+        { id: 'r_main_04', type: 'main', name: "兒童參與：手撕高麗菜炒肉片", nutrition: "高麗菜提供優質膳食纖維，維持腸道健康(腸腦軸線)", shopping_list: "- 高麗菜 1/4顆\n- 豬肉片 50g", steps: "高麗菜洗淨撕碎，與肉片同炒，加少許天然鹽調味。", montessori: "完全不需要刀具！邀請孩子坐在餐桌旁，將高麗菜葉一片片「撕」成小塊。參與感能提升60%接受度。" },
+        { id: 'r_main_05', type: 'main', name: "抗發炎魔法：番茄肉醬糙米麵", nutrition: "茄紅素與維生素B群，對抗身體發炎並修復神經", shopping_list: "- 牛豬混合絞肉 50g\n- 大番茄 1顆\n- 糙米義大利麵 適量", steps: "番茄底部劃十字燙過去皮切丁。熬煮成肉醬後拌入煮熟的糙米麵。", montessori: "讓孩子負責把冷卻後的番茄『剝皮』，這種撕拉的觸覺回饋對感覺統合非常有益。" },
+        { id: 'r_main_06', type: 'main', name: "植物蛋白霸主：雙色地瓜豆腐排", nutrition: "植物性優質蛋白與高纖，解決幼兒便秘困擾", shopping_list: "- 板豆腐 50g\n- 豬絞肉 20g\n- 雙色地瓜丁(先蒸軟) 30g", steps: "豆腐壓去水分，與絞肉、地瓜丁混勻，少油煎至定型。", montessori: "孩子最喜歡『壓扁』東西！給他一把叉子，讓他把豆腐壓成泥，這能幫助釋放多餘的精力。" },
+
+        // --- 點心/護腦類 (Snacks) ---
+        { id: 'r_snack_01', type: 'snack', name: "大腦健康甜點：藍莓燕麥優格", nutrition: "花青素(護眼) + 腸道益生菌(平穩情緒)", shopping_list: "- 無糖希臘優格 1小杯\n- 新鮮藍莓 10顆\n- 原味燕麥片 1匙", steps: "將所有材料混合即可。若怕燕麥太硬，可提前一晚泡入優格中軟化。", montessori: "準備一個小碗與專屬小湯匙，讓孩子自己練習將藍莓『舀』進優格碗裡，訓練手眼協調。" },
+        { id: 'r_snack_02', type: 'snack', name: "專注力補給：核桃黑芝麻糊", nutrition: "高鈣(芝麻) + 卵磷脂(核桃)，提升神經傳導效率", shopping_list: "- 黑芝麻粉 1大匙\n- 碎核桃 少許(確認無過敏)\n- 鮮奶 100ml", steps: "鮮奶微波溫熱，拌入黑芝麻粉與壓碎的核桃末。", montessori: "讓孩子將核桃放入厚夾鏈袋中，用木槌或小杯底『敲碎』，這不僅是食物準備，也是極佳的情緒發洩管道。" },
+        { id: 'r_snack_03', type: 'snack', name: "隱形蔬菜魔法：甜椒蘋果汁", nutrition: "維生素C與植化素爆炸，打破對甜椒的恐懼", shopping_list: "- 紅甜椒 1/4顆\n- 蘋果 半顆\n- 溫開水 50ml", steps: "甜椒稍微燙過減少生味，與蘋果一起放入果汁機打勻。", montessori: "讓孩子負責將切好的蘋果塊『投入』果汁機，並讓他們負責按下果汁機的『開關』(享受因果關係的掌控感)。" },
+        { id: 'r_snack_04', type: 'snack', name: "取代市售糖果：烤地瓜條", nutrition: "極高膳食纖維與天然甘甜，滿足對糖分的渴望", shopping_list: "- 黃地瓜 1顆\n- 橄欖油 少許", steps: "地瓜切成薯條狀，拌入極少許橄欖油，烤箱180度烤20分鐘。", montessori: "準備一個大的保鮮盒，放入地瓜條與油，讓孩子蓋緊蓋子用力『搖晃』，讓每一根地瓜均勻沾上油脂。" }
+    ];
+
+    // =================================================================
+    // 🗄️ 大數據區塊 3：蒙特梭利 & 皮亞傑 育兒行為大數據
     // =================================================================
     const mockAIDatabase = [
-        // --- 飲食與食材大數據 (神經科學/腸腦軸線) ---
-        {
-            keywords: ['鮭魚', 'salmon', '雞蛋', 'egg', '核桃', '酪梨', 'avocado'],
-            diary_title: "優質脂肪與大腦生長", stats: { health: 95, mood: 90, diet: 100 },
-            behavior_analysis: "今日攝取了豐富的 Omega-3 與優質脂肪，這是建構大腦神經細胞膜的重要原料。",
-            psy_analysis: "【腦神經科學】3-6歲大腦重量已達成人的 90%。DHA 與膽鹼能幫助海馬迴發育，提升記憶力與學習專注力。",
-            tips: "【營養建議】脂溶性維生素搭配油脂吸收最好。建議這些高營養食材可以安排在白天活動量大時攝取，幫助大腦全速運轉。",
-            recipe_id: 'r_main_05'
-        },
-        {
-            keywords: ['蘋果', 'apple', '香蕉', 'banana', '花椰菜', 'broccoli', '南瓜', 'pumpkin', '菠菜', 'spinach', '番茄', 'tomato'],
-            diary_title: "腸腦軸線與情緒穩定", stats: { health: 95, mood: 95, diet: 90 },
-            behavior_analysis: "今日攝取了豐富的植物纖維與植化素，這為腸道好菌提供了極佳的環境。",
-            psy_analysis: "【腸腦軸線 Gut-Brain Axis】醫學研究證實，人體 90% 的血清素(快樂荷爾蒙)是在腸道合成的。健康的腸道微生物叢能大幅降低幼兒焦慮與情緒暴躁。",
-            tips: "【營養學教養】蔬菜的水溶性纖維是益生菌最好的食物。如果孩子挑食，可以將蔬菜打成濃湯(如南瓜湯)掩蓋質地。",
-            recipe_id: 'r_main_03'
-        },
         {
             keywords: ['自己吃飯', '餐具', '動手', '獨立'],
             diary_title: "「我自己來！」獨立性的萌芽", stats: { health: 90, mood: 95, diet: 80 },
-            behavior_analysis: "3歲後孩子強烈渴望獨立，使用餐具雖會弄髒，但這是手眼協調與自信心的關鍵練習。",
             psy_analysis: "【愛利克森心理學】處於「主動對內疚」階段，若父母過度干涉(怕髒而代為餵食)，會讓孩子產生能力不足的內疚感。",
-            tips: "【蒙特梭利】為孩子準備「適合他尺寸」的餐具與抹布。教他『如何清理』，而不是剝奪他自己吃的機會。",
+            tips: "【蒙特梭利】為孩子準備「適合他尺寸」的餐具與抹布。吃得一塌糊塗時，教他『如何清理』，而不是責備或剝奪他自己吃的機會。",
             recipe_id: 'r_main_01'
         },
         {
-            keywords: ['挑食', '拒吃', '蔬菜'],
+            keywords: ['挑食', '拒吃', '不吃', '吐'],
             diary_title: "面對幼兒「食物恐新症」", stats: { health: 70, mood: 60, diet: 90 },
-            behavior_analysis: "拒絕綠色蔬菜或新食物，是學齡前兒童出於自我保護本能的「食物恐新症(Neophobia)」。",
-            psy_analysis: "【大腦發展】強迫進食會啟動杏仁核的「戰鬥或逃跑」反應，導致未來更排斥進食。",
-            tips: "【正向教養】實行「責任分散制」：父母負責決定『準備什麼』，孩子負責決定『吃多少』。只要他願意將菜放在盤子裡也是進步。",
-            recipe_id: 'r_main_03'
+            psy_analysis: "【大腦發展】他們對苦味和不熟悉的質地極度敏感。強迫進食會啟動杏仁核的「戰鬥或逃跑」反應，導致未來更排斥。",
+            tips: "【正向教養】實行「責任分散制」：父母負責決定『準備什麼』，孩子負責決定『吃多少』。只要他願意將菜放在盤子裡就是進步。",
+            recipe_id: 'r_snack_03'
         },
         {
             keywords: ['家事', '幫忙', '擦桌子', '收玩具'],
             diary_title: "日常生活練習的黃金期", stats: { health: 90, mood: 100, diet: 85 },
-            behavior_analysis: "孩子主動參與家事，顯示他正在建立對家庭的歸屬感與責任感。",
             psy_analysis: "【阿德勒心理學】貢獻感是孩子自信的來源。當他覺得「我是有用的」，行為問題就會大幅減少。",
-            tips: "【蒙特梭利 Practical Life】給他一把小掃把，或者讓他負責洗塑膠碗，這是最好的專注力訓練。",
+            tips: "【蒙特梭利 Practical Life】此時期的家事不是為了「做完美」，而是為了「過程」。給他一把小掃把，這是最好的專注力訓練。",
             recipe_id: 'r_main_04'
+        },
+        {
+            keywords: ['零食', '糖', '甜', '想吃'],
+            diary_title: "血糖波動與零食攻防戰", stats: { health: 60, mood: 50, diet: 40 },
+            psy_analysis: "【行為制約】如果把零食當作「乖乖吃飯的獎勵」，會讓孩子潛意識認為「正餐是痛苦的，零食才是好的」。",
+            tips: "【營養學教養】不要完全禁止(會造成報復性吃糖)，而是「規範時間與份量」。例如：下午3點是固定的點心時間，提供健康替代品。",
+            recipe_id: 'r_snack_04'
         },
         {
             keywords: ['公園', '跑', '跳', '放電', '溜滑梯'],
             diary_title: "前庭覺與本體覺的大補丸", stats: { health: 100, mood: 95, diet: 90 },
-            behavior_analysis: "戶外高強度運動正為大腦提供大量的前庭覺與本體覺刺激。",
-            psy_analysis: "【感統發展】充分的戶外活動能提升血清素與多巴胺分泌，有效提升傍晚情緒穩定度與夜間睡眠品質。",
-            tips: "【風險評估】忍住不要一直說「小心會掉下來」。改成說：「你有抓緊嗎？」讓孩子學會評估自己的身體能力。",
-            recipe_id: 'r_main_02'
+            psy_analysis: "【感統發展】3-6歲是感覺統合發展巔峰。戶外活動能提升血清素與多巴胺分泌，有效提升情緒穩定度與睡眠品質。",
+            tips: "【風險評估能力】在安全的遊具上，忍住不要說「小心會掉下來」。改成：「你有抓緊嗎？腳踩穩喔。」讓孩子評估自己的能力。",
+            recipe_id: 'r_main_05'
         },
         {
-            keywords: ['畫畫', '勞作', '積木', '拼圖', '手'],
+            keywords: ['畫畫', '剪刀', '積木', '拼圖', '手', '勞作'],
             diary_title: "指尖上的大腦體操", stats: { health: 85, mood: 90, diet: 80 },
-            behavior_analysis: "專注於手部操作，這是建立大腦神經突觸與「手眼協調」的重要時刻。",
-            psy_analysis: "【皮亞傑認知發展】孩子正在理解「因果關係」(把積木疊高會倒)。這是抽象思維發展的重大里程碑。",
-            tips: "【引導技巧】當孩子展示作品時，不要只說「好漂亮」。試著問：「你可以告訴我這個紅色的是什麼故事嗎？」激發他的語言表達。",
-            recipe_id: 'r_snack_01'
+            psy_analysis: "【皮亞傑認知發展】3歲後的畫作從「塗鴉」逐漸進入「象徵期」。這是抽象思維發展的重大里程碑。",
+            tips: "【引導技巧】展示作品時，不要只說「好漂亮」。試著問：「你可以告訴我這個紅色的是什麼故事嗎？」激發語言表達。",
+            recipe_id: 'r_bf_02'
         },
         {
-            keywords: ['崩潰', '哭鬧', '生氣', '情緒', '尖叫'],
-            diary_title: "理智斷線的「杏仁核劫持」", stats: { health: 70, mood: 30, diet: 70 },
-            behavior_analysis: "大腦的「理智中心」(前額葉)尚未發育成熟，被「情緒中心」(杏仁核)完全接管。",
-            psy_analysis: "【大腦科學】這不是孩子故意作對，而是他真的控制不住。此時講道理是無效的，聽覺處理區域已經關閉。",
-            tips: "【腦內風暴】處理步驟：1. 接納(陪伴) 2. 標明情緒(我知道你很生氣) 3. 轉移或解決。【先連結，再規範】。",
-            recipe_id: 'r_breakfast_02'
+            keywords: ['為什麼', '問', '一直問', '好奇'],
+            diary_title: "無止盡的「十萬個為什麼」", stats: { health: 85, mood: 95, diet: 80 },
+            psy_analysis: "【認知心理學】這顯示他的邏輯思維與語言結構正在飛速成長。每一次回答，都在建構他的世界觀。",
+            tips: "【反問法】當你被問到煩時，試著把球丟回去：「真是個好問題！你覺得為什麼天是藍的呢？」鼓勵他先自己思考。",
+            recipe_id: 'r_snack_02'
         },
         {
             keywords: ['繪本', '故事', '書', '共讀', '讀'],
             diary_title: "海綿般的語言與同理心吸收期", stats: { health: 80, mood: 100, diet: 80 },
-            behavior_analysis: "透過共讀，大腦的布洛卡區(語言表達)與韋尼克區(語言理解)受到強烈刺激。",
-            psy_analysis: "【心智理論】聽故事是3-6歲孩子發展「同理心」的最佳途徑，他們開始能理解主角為什麼難過。",
-            tips: "【哈佛對話式閱讀】不要只是單向唸字。多提問：「這隻小熊在做什麼？」，讓他成為說故事的參與者。",
-            recipe_id: 'r_snack_02'
+            psy_analysis: "【心智理論】聽故事是3-6歲孩子發展「同理心」的最佳途徑，他們開始能理解主角為什麼會難過。",
+            tips: "【哈佛對話式閱讀】多問寶寶「這是什麼？」、「他為什麼在哭？」，讓他成為說故事的參與者，而不只是聆聽者。",
+            recipe_id: 'r_bf_04'
+        },
+        {
+            keywords: ['崩潰', '哭鬧', '生氣', '情緒', '尖叫'],
+            diary_title: "理智斷線的「杏仁核劫持」", stats: { health: 70, mood: 30, diet: 70 },
+            psy_analysis: "【大腦科學】大腦「理智中心」尚未成熟，被「情緒中心」接管。此時講道理無效，因為聽覺處理區域已經關閉。",
+            tips: "【先連結，再規範】1. 接納陪伴 2. 標明情緒(「我知道積木倒了你很生氣」) 3. 轉移或解決(等他平靜後再來討論)。",
+            recipe_id: 'r_bf_01'
+        },
+        {
+            keywords: ['搶', '玩具', '打人', '爭吵'],
+            diary_title: "物權觀念與社交衝突", stats: { health: 85, mood: 60, diet: 85 },
+            psy_analysis: "【皮亞傑 自我中心主義】3-4歲孩子處於「我看到的就是我的」。強迫分享會破壞安全感，分享須建立在「物權安全感」之上。",
+            tips: "【衝突介入】父母應作為和平翻譯機。說：「你想玩這個對嗎？但小明正在玩。我們可以問他『等一下可以借我嗎？』」",
+            recipe_id: 'r_main_03'
+        },
+        {
+            keywords: ['不睡覺', '睡', '晚上', '夜驚'],
+            diary_title: "睡眠抗拒與神經元修剪", stats: { health: 70, mood: 50, diet: 75 },
+            psy_analysis: "【睡眠心理學】睡眠抗拒通常來自「分離焦慮」或「想要掌控自主權」(覺得睡覺很無聊)。",
+            tips: "【建立儀式感】提前一小時關閉螢幕(藍光抑制褪黑激素)。給孩子有限的選擇權：「今晚聽小熊還是兔子的故事？」",
+            recipe_id: 'r_bf_01'
         }
     ];
 
     const fallbackData = {
         diary_title: "學齡前大腦建構日常", stats: { health: 85, mood: 85, diet: 85 },
-        behavior_analysis: "看似平凡的一天，孩子的海綿大腦都在透過五官感受建立神經元連結。",
-        psy_analysis: "【兒童發展】規律的作息能大幅降低學齡前兒童的焦慮感，建立內在安全感的基石。",
+        psy_analysis: "【兒童發展】規律的作息(Routine)能大幅降低幼兒焦慮，他們知道「接下來會發生什麼事」，這是安全感的基石。",
         tips: "【專家建議】每天保留 15 分鐘的「特殊時光」，放下手機，完全跟隨孩子的帶領玩遊戲，能解決 80% 尋求關注的行為問題。",
-        recipe_id: 'r_main_01'
+        recipe_id: 'r_main_06'
     };
 
     const badgeData = [
@@ -539,29 +480,18 @@
         { id: 'motor', icon: '🛝', name: '體能健將', keywords: ['公園', '跑', '跳', '放電', '玩'] },
         { id: 'art', icon: '🎨', name: '創意大師', keywords: ['畫畫', '積木', '剪刀', '勞作', '手'] },
         { id: 'logic', icon: '🧠', name: '好奇哲學家', keywords: ['為什麼', '問', '書', '繪本', '知道'] },
-        { id: 'emotion', icon: '❤️', name: '情緒練習生', keywords: ['生氣', '崩潰', '哭', '玩具', '朋友', '搶'] },
-        { id: 'food', icon: '🥦', name: '營養探索家', keywords: ['吃', '飯', '菜', '零食', '挑食', '蘋果', '香蕉', '魚', '蛋'] }
+        { id: 'emotion', icon: '❤️', name: '情緒練習生', keywords: ['生氣', '崩潰', '哭', '玩具', '朋友'] },
+        { id: 'food', icon: '🥦', name: '營養探索家', keywords: ['吃', '飯', '菜', '零食', '挑食', '蘋果', '蛋'] }
     ];
 
     const PIN = '2023'; 
-    let ep = "", compressedBase64 = "", currentWeatherData = "晴朗", activeTags = [];
+    let ep = "", compressedBase64 = "", activeTags = [];
 
     window.onload = () => { 
-        setOfflineWeather(); 
         initBadges(); 
-        renderRecipes('all'); 
+        renderRecipes('all');
     };
 
-    function setOfflineWeather() {
-        const today = new Date();
-        const seed = today.getFullYear() + today.getMonth() + today.getDate();
-        const weatherOptions = ['☀️ 晴朗', '⛅ 多雲', '🌧️ 微雨', '🌤️ 晴時多雲'];
-        const temp = 24 + (seed % 8); 
-        currentWeatherData = `氣象情報：${weatherOptions[seed % weatherOptions.length]}, ${temp}°C`;
-        document.getElementById('weather-widget').innerHTML = currentWeatherData;
-    }
-
-    // 提示與安全彈窗 (取代 Alert/Confirm)
     function showT(msg, type="success") { 
         let e = document.getElementById("toast"); 
         document.getElementById("toast-msg").innerText = msg; 
@@ -569,12 +499,6 @@
         e.className = "show"; setTimeout(() => e.classList.remove("show"), 3500); 
     }
 
-    function showModal(text) {
-        document.getElementById('modal-text').innerText = text;
-        document.getElementById('modal-overlay').style.display = 'flex';
-    }
-
-    // 密碼鎖邏輯
     function press(v) {
         if(v==='del') ep = ep.slice(0, -1); else if(ep.length < 4) ep += v;
         document.querySelectorAll('.dot').forEach((d,i) => i < ep.length ? d.classList.add('filled') : d.classList.remove('filled'));
@@ -586,14 +510,13 @@
         }, 200);
     }
 
-    // 分頁切換
     function nav(id, el) { 
         document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on')); 
         document.querySelectorAll('.n-item').forEach(n=>n.classList.remove('on')); 
         document.getElementById('t-'+id).classList.add('on'); el.classList.add('on'); 
     }
 
-    // 無損圖片壓縮引擎 (避免 LocalStorage 爆滿)
+    // --- 極致壓縮引擎 ---
     function preview(input) {
         if (input.files && input.files[0]) {
             let reader = new FileReader();
@@ -606,7 +529,7 @@
 
                     let canvas = document.getElementById('compressCanvas');
                     let ctx = canvas.getContext('2d');
-                    let MAX_WIDTH = 500; 
+                    let MAX_WIDTH = 400; 
                     let ratio = MAX_WIDTH / img.width;
                     if(ratio > 1) ratio = 1; 
                     
@@ -621,11 +544,22 @@
         }
     }
 
-    // 標籤邏輯
+    // --- 快速標籤邏輯 ---
     function toggleTag(btn, tagStr, category) {
         btn.classList.toggle('active');
         if (btn.classList.contains('active')) activeTags.push({str: tagStr, cat: category});
         else activeTags = activeTags.filter(t => t.str !== tagStr);
+        updateTextArea();
+    }
+    
+    function addTextTag(str) {
+        if(!activeTags.some(t => t.str === str)) {
+            activeTags.push({str: str, cat: 'text'});
+            updateTextArea();
+        }
+    }
+
+    function updateTextArea() {
         let txtArea = document.getElementById('txt');
         let d = new Date(); let todayStr = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
         let currentText = txtArea.value.replace(/\[.*?\]\s*/g, ''); 
@@ -633,26 +567,58 @@
         else txtArea.value = currentText;
     }
 
-    // 🍏 雙語食材快搜邏輯
-    function filterFoodTags(query) {
-        let q = query.toLowerCase();
-        let btns = document.querySelectorAll('#food-tag-group .tag-btn');
-        btns.forEach(btn => {
-            if (btn.innerText.toLowerCase().includes(q)) {
-                btn.style.display = 'inline-flex';
-            } else {
-                btn.style.display = 'none';
+    // --- 🍎 食材大數據快搜模組 (自建+內建字典) ---
+    function suggestFood(val) {
+        let box = document.getElementById('foodSuggestions');
+        if (!val.trim()) { box.style.display = 'none'; return; }
+        
+        let q = val.toLowerCase();
+        let matches = [];
+        
+        // 1. 搜尋內建專業食材庫
+        foodDictionary.forEach(f => {
+            if (f.tw.includes(q) || f.en.toLowerCase().includes(q)) {
+                matches.push({ type: 'dict', text: f.tw, tag: f.tag });
             }
         });
+        
+        // 2. 搜尋歷史紀錄中手動輸入過的食材 (簡單提取)
+        let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
+        let pastFoods = [...new Set(history.map(h => h.food).filter(f => f))];
+        pastFoods.forEach(pf => {
+            if (pf.toLowerCase().includes(q) && !matches.some(m => m.text === pf)) {
+                matches.push({ type: 'history', text: pf, tag: '自訂食材' });
+            }
+        });
+        
+        if (matches.length > 0) {
+            box.innerHTML = matches.map(m => `
+                <div class="suggestion-item" onclick="selectFood('${m.text}', '${m.tag}')">
+                    <span>🍎 ${m.text}</span>
+                    <span style="font-size:11px; background:#FDEBD0; color:#D35400; padding:2px 6px; border-radius:8px;">${m.tag}</span>
+                </div>
+            `).join('');
+            box.style.display = 'block';
+        } else {
+            // 提供新增選項
+            box.innerHTML = `<div class="suggestion-item" onclick="selectFood('${val}', '自訂食材')">➕ 新增自訂食材: "${val}"</div>`;
+            box.style.display = 'block';
+        }
+    }
+    
+    function selectFood(val, tag) {
+        addTextTag(`${val}(${tag})`);
+        document.getElementById('foodInput').value = ''; // 選完清空
+        document.getElementById('foodSuggestions').style.display = 'none';
+        showT(`已加入食材：${val}`);
     }
 
-    // 📍 隱形大數據：地點快搜模組
+    // --- 📍 地點快搜模組 (Self-Building) ---
     function suggestPlaces(val) {
         let box = document.getElementById('placeSuggestions');
         if (!val.trim()) { box.style.display = 'none'; return; }
         
-        // 自動從歷史紀錄中建立地點庫
-        let history = JSON.parse(localStorage.getItem('babyHistory_Flagship') || '[]');
+        let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
         let places = [...new Set(history.map(h => h.place).filter(p => p))]; 
         
         let matches = places.filter(p => p.toLowerCase().includes(val.toLowerCase()));
@@ -661,7 +627,7 @@
             box.innerHTML = matches.map(m => `<div class="suggestion-item" onclick="selectPlace('${m}')">📍 ${m}</div>`).join('');
             box.style.display = 'block';
         } else {
-            box.style.display = 'none';
+             box.style.display = 'none';
         }
     }
     
@@ -670,15 +636,19 @@
         document.getElementById('placeSuggestions').style.display = 'none';
     }
     
-    // 點擊空白處關閉地點提示
+    // 點擊空白處關閉提示框
     document.addEventListener('click', function(e) {
-        if(!e.target.closest('.place-input-wrapper')) {
-            let box = document.getElementById('placeSuggestions');
-            if(box) box.style.display = 'none';
+        if(!e.target.closest('#placeInput')) {
+            let pBox = document.getElementById('placeSuggestions');
+            if(pBox) pBox.style.display = 'none';
+        }
+        if(!e.target.closest('#foodInput')) {
+            let fBox = document.getElementById('foodSuggestions');
+            if(fBox) fBox.style.display = 'none';
         }
     });
 
-    // 🧠 核心：智能語意評分演算法 (TF-IDF 概念 + 食譜雙引擎聯動)
+    // --- 🧠 核心：智能語意評分演算法 (TF-IDF + 食譜雙引擎聯動) ---
     function getMockData(tags, text) {
         const combinedText = (tags.map(t=>t.str).join(' ') + ' ' + text).toLowerCase();
         let bestMatch = fallbackData;
@@ -687,7 +657,9 @@
         mockAIDatabase.forEach(data => {
             let score = 0;
             data.keywords.forEach(kw => {
-                if (combinedText.includes(kw.toLowerCase())) score += 5; // 加強權重
+                // 如果點擊了專屬標籤，權重加乘 5 倍，精準命中！
+                if (tags.some(t => t.str.includes(kw))) score += 5; 
+                else if (combinedText.includes(kw)) score += 1;
             });
             if (score > highestScore) {
                 highestScore = score;
@@ -697,6 +669,8 @@
         
         // 聯動食譜庫
         let linkedRecipe = recipeDatabase.find(r => r.id === bestMatch.recipe_id);
+        if(!linkedRecipe) linkedRecipe = recipeDatabase[0]; // fallback
+        
         return { ...JSON.parse(JSON.stringify(bestMatch)), full_recipe: linkedRecipe }; 
     }
 
@@ -713,19 +687,14 @@
             
             // 寫入分析面板
             document.getElementById('r-tag').innerText = "📝 " + v.diary_title; 
-            document.getElementById('r-beh').innerText = v.behavior_analysis; 
+            document.getElementById('r-beh').innerText = "系統已完成語意特徵與神經科學分析。"; 
             document.getElementById('r-psy').innerText = v.psy_analysis; 
             document.getElementById('r-tips').innerText = v.tips; 
             
-            if(v.full_recipe) {
-                document.getElementById('r-rname').innerText = v.full_recipe.name; 
-                document.getElementById('r-ring').innerText = v.full_recipe.shopping_list; 
-                document.getElementById('r-rstep').innerText = v.full_recipe.steps; 
-                document.getElementById('r-rmont').innerText = v.full_recipe.montessori; 
-                document.getElementById('r-recipe-box').style.display = 'block';
-            } else {
-                document.getElementById('r-recipe-box').style.display = 'none';
-            }
+            document.getElementById('r-rname').innerText = v.full_recipe.name; 
+            document.getElementById('r-ring').innerText = v.full_recipe.shopping_list; 
+            document.getElementById('r-rstep').innerText = v.full_recipe.steps; 
+            document.getElementById('r-rmont').innerText = v.full_recipe.montessori; 
             
             document.getElementById('res').style.display = 'block'; 
             setTimeout(() => {
@@ -742,8 +711,7 @@
             // UI Reset
             document.getElementById('txt').value = ''; 
             document.getElementById('placeInput').value = ''; 
-            document.getElementById('foodSearch').value = '';
-            filterFoodTags(''); // Reset food tags display
+            document.getElementById('foodInput').value = ''; 
             compressedBase64 = ""; document.getElementById('imgInput').value = ""; document.getElementById('pre').style.display = 'none'; document.getElementById('upL').style.display = 'flex';
             activeTags = []; document.querySelectorAll('.tag-btn').forEach(b=>b.classList.remove('active'));
             document.getElementById('sBtn').disabled = false; document.getElementById('load').style.display = 'none';
@@ -753,23 +721,26 @@
 
     function saveToLocalDB(text, aiData, imgData) {
         let placeVal = document.getElementById('placeInput').value.trim();
+        // 抓取剛剛輸入的食材，用於自建字典
+        let foodVal = document.getElementById('foodInput').value.trim();
+        
         try {
-            let history = JSON.parse(localStorage.getItem('babyHistory_Flagship') || '[]');
+            let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
             history.unshift({
                 time: new Date().getTime(),
                 text: text,
                 title: aiData.diary_title,
-                weather: currentWeatherData,
                 img: imgData,
-                place: placeVal // 記錄地點
+                place: placeVal,
+                food: foodVal
             });
             if(history.length > 50) history = history.slice(0, 50); 
-            localStorage.setItem('babyHistory_Flagship', JSON.stringify(history));
+            localStorage.setItem('babyHistory_FlagshipV2', JSON.stringify(history));
         } catch(e) {
             if (e.name === 'QuotaExceededError') {
-                let history = JSON.parse(localStorage.getItem('babyHistory_Flagship') || '[]');
+                let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
                 history = history.slice(0, Math.floor(history.length / 2));
-                localStorage.setItem('babyHistory_Flagship', JSON.stringify(history));
+                localStorage.setItem('babyHistory_FlagshipV2', JSON.stringify(history));
                 showT("記憶體已滿，自動清理舊紀錄！", "error");
             }
         }
@@ -817,7 +788,7 @@
     function getHis() {
         let his = document.getElementById('his'); his.innerHTML = ""; document.getElementById('his-load').style.display = 'block'; 
         setTimeout(() => {
-            let history = JSON.parse(localStorage.getItem('babyHistory_Flagship') || '[]');
+            let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
             his.innerHTML = history.map(i => {
                 
                 // 完美的 HTML5 原生下載按鈕
@@ -825,16 +796,18 @@
                     <div style="margin-top:15px;">
                         <img src="${i.img}" style="width:100%; max-width:400px; border-radius:12px; display:block; margin-bottom:10px; border:1px solid #EEE;">
                         <a href="${i.img}" download="Nanny-Memory-${i.time}.jpg" style="display:inline-block; background:linear-gradient(135deg, #3498DB, #2980B9); color:white; padding:10px 18px; border-radius:10px; font-size:14px; text-decoration:none; font-weight:700; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); transition: 0.2s;">
-                            📥 下載此張相片到裝置
+                            📥 點擊下載相片至裝置
                         </a>
                         <div style="font-size:11px; color:#95A5A6; margin-top:5px;">*若 iOS 無法直接下載，請長按圖片選擇「儲存照片」</div>
                     </div>` : '';
 
                 // 📍 地點藍色徽章顯示
-                let placeHtml = i.place ? `<span style="color:#3498DB; font-weight:700; margin-left:8px; background:#EBF5FB; padding:3px 8px; border-radius:12px;"><span style="font-size:10px;">📍</span> ${i.place}</span>` : '';
+                let placeHtml = i.place ? `<span class="highlight-badge">📍 ${i.place}</span>` : '';
 
                 return `<div style="background:#fff; border:1px solid #E5E8E8; padding:20px; margin-bottom:20px; border-radius:18px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                    <div style="font-size:12px;color:#95A5A6; margin-bottom:10px; font-weight:bold;">${new Date(i.time).toLocaleString()} | ${i.weather} ${placeHtml}</div>
+                    <div style="font-size:12px;color:#95A5A6; margin-bottom:10px; font-weight:bold;">
+                        ${placeHtml} ${new Date(i.time).toLocaleString()}
+                    </div>
                     <div style="font-weight:800;color:var(--p);font-size:18px;">${i.title}</div>
                     <div style="font-size:15px; margin-top:10px; color:#555; white-space:pre-wrap; line-height: 1.6;">${i.text}</div>
                     ${imgHtml}</div>`;
@@ -845,8 +818,8 @@
 
     // --- 備份與還原功能 ---
     function exportData() {
-        let history = localStorage.getItem('babyHistory_Flagship');
-        if (!history || history === '[]') return showModal("沒有資料可以備份喔！");
+        let history = localStorage.getItem('babyHistory_FlagshipV2');
+        if (!history || history === '[]') return document.getElementById('toast-msg').innerText="沒有資料可以備份", document.getElementById('toast').className="show", setTimeout(()=>document.getElementById('toast').className="",3000);
         let blob = new Blob([history], { type: "application/json" });
         let url = URL.createObjectURL(blob);
         let a = document.createElement('a');
@@ -862,7 +835,7 @@
             try {
                 let data = JSON.parse(e.target.result);
                 if (Array.isArray(data)) {
-                    localStorage.setItem('babyHistory_Flagship', JSON.stringify(data));
+                    localStorage.setItem('babyHistory_FlagshipV2', JSON.stringify(data));
                     showT("✅ 資料還原成功！請重新點擊載入");
                     getHis();
                 } else throw new Error();
@@ -882,7 +855,7 @@
         document.getElementById('scanBtn').disabled = true; document.getElementById('scan-load').style.display = 'block';
         
         setTimeout(() => {
-            let history = JSON.parse(localStorage.getItem('babyHistory_Flagship') || '[]');
+            let history = JSON.parse(localStorage.getItem('babyHistory_FlagshipV2') || '[]');
             
             let langScore = 0, motorScore = 0, cogScore = 0, socScore = 0;
             let badgeCounts = {};
@@ -892,16 +865,16 @@
             let talents = { spatial: 0, kinesthetic: 0, linguistic: 0, interpersonal: 0 };
 
             history.forEach(h => {
-                let text = (h.text + h.title + (h.place||'')).toLowerCase();
+                let text = (h.text + h.title + (h.place||'') + (h.food||'')).toLowerCase();
                 
                 // 基礎能力
                 if (text.includes('讀') || text.includes('書') || text.includes('問') || text.includes('故事')) { langScore += 10; talents.linguistic += 1; }
                 if (text.includes('跑') || text.includes('公園') || text.includes('剪刀') || text.includes('積木')) { motorScore += 10; talents.kinesthetic += 1; }
-                if (text.includes('飯') || text.includes('自己') || text.includes('蘋果') || text.includes('魚')) { cogScore += 10; talents.interpersonal += 1; }
-                if (text.includes('笑') || text.includes('哭') || text.includes('朋友') || text.includes('分享')) { socScore += 10; talents.interpersonal += 1; }
+                if (text.includes('飯') || text.includes('自己') || text.includes('蘋果') || text.includes('魚') || text.includes('菜')) { cogScore += 10; }
+                if (text.includes('笑') || text.includes('哭') || text.includes('朋友') || text.includes('分享') || text.includes('情緒')) { socScore += 10; talents.interpersonal += 1; }
                 
                 // 空間智能
-                if (text.includes('畫') || text.includes('積木') || text.includes('勞作')) { talents.spatial += 2; }
+                if (text.includes('畫') || text.includes('積木') || text.includes('勞作') || text.includes('拼圖')) { talents.spatial += 2; }
 
                 badgeData.forEach(b => {
                     b.keywords.forEach(kw => {
@@ -942,11 +915,11 @@
             
             let talentMsg = "";
             if (maxVal === 0) {
-                talentMsg = "歷史資料尚不足分析。請多使用【雙語食材字典】與【地點快搜】持續記錄，AI 將為您解鎖潛能報告！";
+                talentMsg = "歷史資料尚不足分析。請多使用【食材快搜】與【地點快搜】持續記錄，AI 將為您解鎖潛能報告！";
             } else {
                 if (maxTalent === 'spatial') talentMsg = "<b>🎨 空間視覺智能 (Visual-Spatial) 突出！</b><br>大數據發現寶寶在建構上極具潛力！建議提供開放式建構玩具（如磁力片）。";
                 else if (maxTalent === 'kinesthetic') talentMsg = "<b>🏃 肢體動覺智能 (Bodily-Kinesthetic) 突出！</b><br>顯示極佳粗大肌肉協調性。建議多引導戶外障礙賽，將動能轉為腦神經連結。";
-                else if (maxTalent === 'linguistic') talentMsg = "<b>🗣️ 語文智能 (Linguistic) 突出！</b><br>對語言極度敏感，正是引入第二外語或高階繪本共讀的黃金期。";
+                else if (maxTalent === 'linguistic') talentMsg = "<b>🗣️ 語文智能 (Linguistic) 突出！</b><br>對語言極度敏感，正是引入高階繪本共讀的黃金期。";
                 else if (maxTalent === 'interpersonal') talentMsg = "<b>🤝 人際內省智能 (Interpersonal) 突出！</b><br>對情緒非常敏銳，賦予他更多家事「小幫手」任務能建立強大責任感。";
             }
 
